@@ -6,7 +6,7 @@ from preprocess import *
 from hsv import *
 
 class SensorDetectorResult:
-	def __init__(self, sensorDetector, matches, match_map):
+	def __init__(self, detector, matches, match_map):
 		self.matches = matches
 		self.match_map = match_map
 
@@ -14,17 +14,8 @@ class SensorDetectorResult:
 		self.rss = np.sum(1 - self.scores)
 		self.rsquared = self.rss / len(self)
 
-		self.pattern_shape = sensorDetector.pattern.shape[:2]		
+		self.pattern_shape = detector.pattern.shape[:2]		
 		self._color_gradient = lambda val: (0, val*2*255, 255) if val < 0.5 else (0, 255, (1-val)*2*255) #BGR
-
-	def __len__(self):
-		return len(self.matches)
-
-	def __getitem__(self, key):
-		return self.matches[key]
-
-	def __iter__(self):
-		return iter(self.matches)
 
 	def paint(self, image):
 		draw_image = np.copy(image)
@@ -52,6 +43,17 @@ class SensorDetectorResult:
 		cv2.putText(draw_image, text3, (10, 75), cv2.FONT_HERSHEY_DUPLEX, 0.6, (0,0,255))
 
 		return draw_image 	
+
+	# Magic methods to allow it to behave like a sequence
+	def __len__(self):
+		return len(self.matches)
+
+	def __getitem__(self, key):
+		return self.matches[key]
+
+	def __iter__(self):
+		return iter(self.matches)
+
 
 	# def score(self, y, x):
 	# 	return self.match_map[y, x]
@@ -99,25 +101,39 @@ class SensorDetector:
 
 	# 	return output
 
+	def _best_matches(self, match_map, candidates, labels):
+		num_matches = len(np.unique(labels))
+		min_errors = np.zeros(num_matches, dtype=match_map.dtype)
+		best_matches = np.zeros((num_matches, 2), dtype=candidates.dtype)
+
+		for candidate, label in zip(candidates, labels):
+			error = match_map[tuple(candidate)]
+			if error > min_errors[label]:
+				min_errors[label] = error
+				best_matches[label] = candidate
+
+		return best_matches
+
+
 	def detect(self, image):
 		image_proc = self.preprocess(image)
 
 		match_map = cv2.matchTemplate(image_proc, self.pattern_proc, self.match_method)
 
-		candidate_matches = np.transpose(np.where(match_map >= self.match_threshold))
+		candidates = np.transpose(np.where(match_map >= self.match_threshold))
 
-		if 0 in candidate_matches.shape:
+		if 0 in candidates.shape:
 			raise Warning("0 matches detected")
 			return np.array([]), match_map
 
 		self.clusterer.set_params(bandwidth=self.clustering_bandwidth)
-		self.clusterer.fit(candidate_matches)
+		self.clusterer.fit(candidates)
 		labels = self.clusterer.labels_
-		centers = self.clusterer.cluster_centers_
+		# centers = self.clusterer.cluster_centers_
 
-		# print(len(np.unique(labels)))
+		matches = self._best_matches(match_map, candidates, labels)
 
-		matches = np.int_(centers)
+		# matches = np.int_(centers)
 
 		# cv2.imshow("pattern_proc", pattern_proc)
 		# cv2.imshow("image_proc", image_proc)
