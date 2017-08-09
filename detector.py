@@ -114,17 +114,14 @@ class SensorDetector:
 
 		return best_matches
 
-
 	def detect(self, image):
 		image_proc = self.preprocess(image)
-
 		match_map = cv2.matchTemplate(image_proc, self.pattern_proc, self.match_method)
-
 		candidates = np.transpose(np.where(match_map >= self.match_threshold))
 
 		if 0 in candidates.shape:
 			raise Warning("0 matches detected")
-			return np.array([]), match_map
+			return None
 
 		self.clusterer.set_params(bandwidth=self.clustering_bandwidth)
 		self.clusterer.fit(candidates)

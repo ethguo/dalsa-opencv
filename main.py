@@ -8,14 +8,15 @@ from preprocess import downscale
 
 def main():
 
-	PATH_IMAGE = "img/lab/tray3.png"
-	PATH_PATTERN = "img/lab/tray3_pattern.png"
-	DOWNSCALE = 4
-	WINDOW_NAME = "tray3"
+	PATH_IMAGE = "img/other/allsensors.png"
+	PATH_PATTERN = "img/other/sensor.png"
+	DOWNSCALE = 1
+	WINDOW_NAME = "tray0"
 
-	# FILENAME = "img/lab/tray3.png"
-
-	# filename_pattern = "_pattern.".join(FILENAME.rsplit(".", 1))
+	# PATH_IMAGE = "img/lab/tray3_square.png"
+	# PATH_PATTERN = "img/lab/tray3_pattern.png"
+	# DOWNSCALE = 4
+	# WINDOW_NAME = "tray3"
 
 	image = cv2.imread(PATH_IMAGE, cv2.IMREAD_COLOR)
 	pattern = cv2.imread(PATH_PATTERN, cv2.IMREAD_COLOR)
@@ -23,7 +24,7 @@ def main():
 	image = downscale(image, DOWNSCALE)
 	pattern = downscale(pattern, DOWNSCALE)
 
-	image = image[:,200:]
+	# image = image[:,200:]
 
 	detector = SensorDetector(pattern)
 
