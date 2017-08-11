@@ -1,10 +1,11 @@
-from time import time
-
 import cv2
 import numpy as np
+from matplotlib.figure import Figure
+from time import sleep, time
 
 from detector import SensorDetector
 from preprocess import downscale
+from ui import TkUI
 
 def main():
 
@@ -18,45 +19,63 @@ def main():
 	# DOWNSCALE = 4
 	# WINDOW_NAME = "tray3"
 
-	image = cv2.imread(PATH_IMAGE, cv2.IMREAD_COLOR)
+	img = cv2.imread(PATH_IMAGE, cv2.IMREAD_COLOR)
 	pattern = cv2.imread(PATH_PATTERN, cv2.IMREAD_COLOR)
 
-	image = downscale(image, DOWNSCALE)
+	img = downscale(img, DOWNSCALE)
 	pattern = downscale(pattern, DOWNSCALE)
 
-	# image = image[:,200:]
+	# img = img[:,200:]
 
 	detector = SensorDetector(pattern)
 
-	onChange = lambda x: None # Do nothing function
+	# onChange = lambda x: None # Do nothing function
 
 	# cv2.namedWindow(WINDOW_NAME)
 	# cv2.createTrackbar("match_threshold_percent", WINDOW_NAME, 70, 100, onChange)
 	# cv2.createTrackbar("clustering_bandwidth", WINDOW_NAME, 40, 100, onChange) #permille
-	# cv2.createTrackbar("match_method", WINDOW_NAME, 5, 5, onChange)
+
+	f = Figure()
+	# f.set_tight_layout(True)
+
+	ui = TkUI()
+	ui.addFigure(f)
+	ui.addSlider("match_threshold_percent", 0.7, 0, 1, 0.01)
+	ui.addSlider("clustering_bandwidth", 40, 1, 100)
+
+	ax1 = f.add_subplot(1, 2, 1)
+	ax2 = f.add_subplot(1, 2, 2)
+	# ax3 = f.add_subplot(2, 2, 3)
+	# ax4 = f.add_subplot(2, 2, 4)
 
 	while True:
-		# detector.match_threshold = cv2.getTrackbarPos("match_threshold_percent", WINDOW_NAME) / 100
-		# detector.clustering_bandwidth = cv2.getTrackbarPos("clustering_bandwidth", WINDOW_NAME) or 1
-
 		# Stopwatch execution of detector.detect
 		start_time = time()
 
-		matches = detector.detect(image)
-		
+		detector.match_threshold, changed1 = ui.getSlider("match_threshold_percent")
+		detector.clustering_bandwidth, changed2 = ui.getSlider("clustering_bandwidth")
+
+		if changed1 or changed2:
+			matches = detector.detect(img)
+
+			# Display results
+			result = matches.paint(img)
+
+			img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+			result_rgb = cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
+
+			ax1.imshow(img_rgb)
+			ax2.imshow(result_rgb)
+			ui.updateFigure()
+
+		else:
+			sleep(1/60)
+
+		ui.update()
+
 		time_elapsed = time() - start_time
 		print(time_elapsed)
-		
-		# Display results
-		result = matches.paint(image)
 
-		cv2.imshow(WINDOW_NAME, result)
-		
-		k = cv2.waitKey(1) & 0xFF
-		if k == 27: # ESCAPE key
-			break
-
-	cv2.destroyAllWindows()
 
 if __name__ == '__main__':
 	main()

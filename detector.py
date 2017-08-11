@@ -17,9 +17,10 @@ class SensorDetectorResult:
 		self.pattern_shape = detector.pattern.shape[:2]		
 		self._color_gradient = lambda val: (0, val*2*255, 255) if val < 0.5 else (0, 255, (1-val)*2*255) #BGR
 
-	def paint(self, image):
-		footer = np.zeros((100, image.shape[1], 3), dtype=np.uint8)
-		canvas = np.concatenate([image, footer])
+	def paint(self, img):
+		# footer = np.zeros((100, img.shape[1], 3), dtype=np.uint8)
+		# canvas = np.concatenate([img, footer])
+		canvas = np.copy(img)
 
 		pattern_h, pattern_w = self.pattern_shape
 
@@ -79,12 +80,12 @@ class SensorDetector:
 
 		self.clusterer = MeanShift(self.clustering_bandwidth)
 
-	# def preprocess(self, image):
-	# 	output = image #skip
+	# def preprocess(self, img):
+	# 	output = img #skip
 
-	# 	# output = canny(image, 32)
-	# 	# output = sat_mask(image, self.threshold_block_radius, self.threshold_c)
-	# 	# output = get_sat(image)
+	# 	# output = canny(img, 32)
+	# 	# output = sat_mask(img, self.threshold_block_radius, self.threshold_c)
+	# 	# output = get_sat(img)
 
 	# 	return output
 
@@ -101,9 +102,9 @@ class SensorDetector:
 
 		return best_matches
 
-	def detect(self, image):
-		image_proc = self.preprocess(image)
-		match_map = cv2.matchTemplate(image_proc, self.pattern_proc, self.match_method)
+	def detect(self, img):
+		img_proc = self.preprocess(img)
+		match_map = cv2.matchTemplate(img_proc, self.pattern_proc, self.match_method)
 		candidates = np.transpose(np.where(match_map >= self.match_threshold))
 
 		if 0 in candidates.shape:
@@ -120,6 +121,6 @@ class SensorDetector:
 		# matches = np.int_(centers)
 
 		# cv2.imshow("pattern_proc", pattern_proc)
-		# cv2.imshow("image_proc", image_proc)
+		# cv2.imshow("img_proc", img_proc)
 
 		return SensorDetectorResult(self, matches, match_map)

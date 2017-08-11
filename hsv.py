@@ -1,25 +1,25 @@
 import cv2
 import numpy as np
 
-def get_hsv(image):
-	image_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-	image_hsv_channels = cv2.split(image_hsv)
-	return image_hsv_channels
+def get_hsv(img):
+	img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+	img_hsv_channels = cv2.split(img_hsv)
+	return img_hsv_channels
 
-def get_hue(image):
-	return get_hsv(image)[0]
+def get_hue(img):
+	return get_hsv(img)[0]
 
-def get_sat(image):
-	return get_hsv(image)[1]
+def get_sat(img):
+	return get_hsv(img)[1]
 
-def get_val(image):
-	return get_hsv(image)[2]
+def get_val(img):
+	return get_hsv(img)[2]
 
 
-def sat_mask(image, block_radius=5, c=7):
-	image_sat = get_sat(image)
+def sat_mask(img, block_radius=5, c=7):
+	img_sat = get_sat(img)
 
-	output = cv2.adaptiveThreshold(image_sat, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, block_radius*2+1, c)
+	output = cv2.adaptiveThreshold(img_sat, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, block_radius*2+1, c)
 
 	return output
 
@@ -27,7 +27,7 @@ def sat_mask(image, block_radius=5, c=7):
 # Demo
 if __name__ == "__main__":
 
-	image = cv2.imread("img/allsensors.png", cv2.IMREAD_COLOR)
+	img = cv2.imread("img/allsensors.png", cv2.IMREAD_COLOR)
 
 	onChange = lambda x: None # Do nothing function
 
@@ -40,10 +40,10 @@ if __name__ == "__main__":
 		block_radius = cv2.getTrackbarPos("block_radius", "sat_mask") or 1
 		c = cv2.getTrackbarPos("c", "sat_mask")
 
-		output = sat_mask(image, block_radius, c)
+		output = sat_mask(img, block_radius, c)
 
 		# Display results
-		# cv2.imshow("original", image)
+		# cv2.imshow("original", img)
 		cv2.imshow("sat_mask", output)
 
 		k = cv2.waitKey(1) & 0xFF
