@@ -30,14 +30,14 @@ def main():
 
 	onChange = lambda x: None # Do nothing function
 
-	cv2.namedWindow(WINDOW_NAME)
-	cv2.createTrackbar("match_threshold_percent", WINDOW_NAME, 70, 100, onChange)
-	cv2.createTrackbar("clustering_bandwidth", WINDOW_NAME, 40, 100, onChange) #permille
+	# cv2.namedWindow(WINDOW_NAME)
+	# cv2.createTrackbar("match_threshold_percent", WINDOW_NAME, 70, 100, onChange)
+	# cv2.createTrackbar("clustering_bandwidth", WINDOW_NAME, 40, 100, onChange) #permille
 	# cv2.createTrackbar("match_method", WINDOW_NAME, 5, 5, onChange)
 
 	while True:
-		detector.match_threshold = cv2.getTrackbarPos("match_threshold_percent", WINDOW_NAME) / 100
-		detector.clustering_bandwidth = cv2.getTrackbarPos("clustering_bandwidth", WINDOW_NAME) or 1
+		# detector.match_threshold = cv2.getTrackbarPos("match_threshold_percent", WINDOW_NAME) / 100
+		# detector.clustering_bandwidth = cv2.getTrackbarPos("clustering_bandwidth", WINDOW_NAME) or 1
 
 		# Stopwatch execution of detector.detect
 		start_time = time()
@@ -53,11 +53,10 @@ def main():
 		cv2.imshow(WINDOW_NAME, result)
 		
 		k = cv2.waitKey(1) & 0xFF
-		if k == 27: # Escape key
+		if k == 27: # ESCAPE key
 			break
 
 	cv2.destroyAllWindows()
 
 if __name__ == '__main__':
 	main()
-	# wrapper(main)()

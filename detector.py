@@ -18,31 +18,31 @@ class SensorDetectorResult:
 		self._color_gradient = lambda val: (0, val*2*255, 255) if val < 0.5 else (0, 255, (1-val)*2*255) #BGR
 
 	def paint(self, image):
-		draw_image = np.copy(image)
+		footer = np.zeros((100, image.shape[1], 3), dtype=np.uint8)
+		canvas = np.concatenate([image, footer])
 
 		pattern_h, pattern_w = self.pattern_shape
 
 		for match, score in zip(self.matches, self.scores):
 			y, x = match
-
 			color = self._color_gradient(score)
 
-			cv2.rectangle(draw_image, 
+			cv2.rectangle(canvas, 
 				(x, y), (x + pattern_w, y + pattern_h),
 				color=color, thickness=1)
 
-			cv2.circle(draw_image,
+			cv2.circle(canvas,
 				(x + pattern_w//2, y + pattern_h//2), radius=2,
 				color=color, thickness=-1)
 
 		text1 = "Number of sensors:%3d" %(len(self.matches))
 		text2 = "Average r-squared:%9.6f" %(self.rsquared)
 		text3 = "RSS:%9.6f" %(self.rss)
-		cv2.putText(draw_image, text1, (10, 25), cv2.FONT_HERSHEY_DUPLEX, 0.6, (0,0,255))
-		cv2.putText(draw_image, text2, (10, 50), cv2.FONT_HERSHEY_DUPLEX, 0.6, (0,0,255))
-		cv2.putText(draw_image, text3, (10, 75), cv2.FONT_HERSHEY_DUPLEX, 0.6, (0,0,255))
+		cv2.putText(canvas, text1, (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255))
+		cv2.putText(canvas, text2, (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255))
+		cv2.putText(canvas, text3, (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255))
 
-		return draw_image 	
+		return canvas 	
 
 	# Magic methods to allow it to behave like a sequence
 	def __len__(self):
@@ -53,19 +53,6 @@ class SensorDetectorResult:
 
 	def __iter__(self):
 		return iter(self.matches)
-
-
-	# def score(self, y, x):
-	# 	return self.match_map[y, x]
-
-	# def _color_gradient(self, val):
-	# 	if val < 0.5:
-	# 		r = 255
-	# 		g = val * 2 * 255
-	# 	else:
-	# 		r = (1 - val) * 2 * 255
-	# 		g = 255
-	# 	return (0, g, r)
 
 
 class SensorDetector:
