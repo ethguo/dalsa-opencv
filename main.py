@@ -9,8 +9,8 @@ from ui import TkUI
 
 def main():
 
-	PATH_IMAGE = "img/other/allsensors.png"
-	PATH_PATTERN = "img/other/sensor.png"
+	PATH_IMAGE = "img/lab/tray3.png"
+	PATH_PATTERN = "img/lab/tray3_pattern.png"
 	DOWNSCALE = 1
 	WINDOW_NAME = "tray0"
 
