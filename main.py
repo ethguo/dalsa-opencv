@@ -9,8 +9,8 @@ from ui import TkUI
 
 def main():
 
-	PATH_IMAGE = "img/lab/tray3.png"
-	PATH_PATTERN = "img/lab/tray3_pattern.png"
+	PATH_IMAGE = "img/other/allsensors.png"
+	PATH_PATTERN = "img/other/allsensors_pattern.png"
 	DOWNSCALE = 1
 	WINDOW_NAME = "tray0"
 
@@ -38,9 +38,10 @@ def main():
 	f = Figure()
 	# f.set_tight_layout(True)
 
-	ui = TkUI()
+	ui = TkUI(WINDOW_NAME)
+	ui.addTable()
 	ui.addFigure(f)
-	ui.addSlider("match_threshold_percent", 0.7, 0, 1, 0.01)
+	ui.addSlider("match_threshold",     0.7, 0,   1, 0.01)
 	ui.addSlider("clustering_bandwidth", 40, 1, 100)
 
 	ax1 = f.add_subplot(1, 2, 1)
@@ -49,14 +50,22 @@ def main():
 	# ax4 = f.add_subplot(2, 2, 4)
 
 	while True:
-		# Stopwatch execution of detector.detect
-		start_time = time()
 
-		detector.match_threshold, changed1 = ui.getSlider("match_threshold_percent")
+		detector.match_threshold, changed1 = ui.getSlider("match_threshold")
 		detector.clustering_bandwidth, changed2 = ui.getSlider("clustering_bandwidth")
 
 		if changed1 or changed2:
+			# Stopwatch execution of detector.detect
+			start_time = time()
+
 			matches = detector.detect(img)
+
+			time_elapsed = time() - start_time
+			ui.table.set("Time elapsed", time_elapsed)
+
+			ui.table.set("Number of sensors", len(matches))
+			ui.table.set("R-squared", matches.rsquared)
+			ui.table.set("RSS", matches.rss)
 
 			# Display results
 			result = matches.paint(img)
@@ -72,9 +81,6 @@ def main():
 			sleep(1/60)
 
 		ui.update()
-
-		time_elapsed = time() - start_time
-		print(time_elapsed)
 
 
 if __name__ == '__main__':

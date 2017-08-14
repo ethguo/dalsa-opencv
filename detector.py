@@ -17,7 +17,7 @@ class SensorDetectorResult:
 		self.pattern_shape = detector.pattern.shape[:2]		
 		self._color_gradient = lambda val: (0, val*2*255, 255) if val < 0.5 else (0, 255, (1-val)*2*255) #BGR
 
-	def paint(self, img):
+	def paint(self, img, line_thickness=1):
 		# footer = np.zeros((100, img.shape[1], 3), dtype=np.uint8)
 		# canvas = np.concatenate([img, footer])
 		canvas = np.copy(img)
@@ -30,18 +30,11 @@ class SensorDetectorResult:
 
 			cv2.rectangle(canvas, 
 				(x, y), (x + pattern_w, y + pattern_h),
-				color=color, thickness=1)
+				color=color, thickness=line_thickness)
 
 			cv2.circle(canvas,
-				(x + pattern_w//2, y + pattern_h//2), radius=2,
+				(x + pattern_w//2, y + pattern_h//2), radius=2*line_thickness,
 				color=color, thickness=-1)
-
-		text1 = "Number of sensors:%3d" %(len(self.matches))
-		text2 = "Average r-squared:%9.6f" %(self.rsquared)
-		text3 = "RSS:%9.6f" %(self.rss)
-		cv2.putText(canvas, text1, (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255))
-		cv2.putText(canvas, text2, (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255))
-		cv2.putText(canvas, text3, (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255))
 
 		return canvas 	
 
