@@ -66,20 +66,8 @@ class TkUI:
 			return value, True
 		return value, False
 
-		# slider_value = self.sliders[name].get()
-		# entry_value = self.sliders[name].get()
-		# # Let Entry take precedence over Slider
-		# if entry_value != self.last_values:
-		# 	self.last_values[name] = entry_value
-		# 	return entry_value, True
-		# elif slider_value != self.last_values:
-		# 	self.last_values[name] = slider_value
-		# 	return slider_value, True
-		# else:
-		# 	return entry_value, False
-
 	def setSlider(self, name, value):
-		self.sliders[name].set(value)
+		self.tk_variables[name].set(value)
 		self.last_values[name] = None
 
 	def update(self):
@@ -87,9 +75,6 @@ class TkUI:
 
 	def updateFigure(self):
 		self.canvas.show()
-
-	def updateTable(self):
-		self.table.update()
 
 	def mainloop(self):
 		self.root.mainloop()

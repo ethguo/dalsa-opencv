@@ -5,17 +5,20 @@ from sklearn.cluster import MeanShift, estimate_bandwidth
 from preprocess import *
 from hsv import *
 
+color_gradient = lambda val: (0, val*2*255, 255) if val < 0.5 else (0, 255, (1-val)*2*255) #BGR
+
 class SensorDetectorResult:
 	def __init__(self, detector, matches, match_map):
 		self.matches = matches
 		self.match_map = match_map
 
 		self.scores = match_map[tuple(np.transpose(matches))]
-		self.rss = np.sum(1 - self.scores)
-		self.rsquared = self.rss / len(self)
+		self.squared_errors = (1 - self.scores) ** 2
+		self.rss = np.sum(self.squared_errors)
+		self.avg_error = self.rss / len(self)
+		self.product_error = np.product(self.scores)
 
-		self.pattern_shape = detector.pattern.shape[:2]		
-		self._color_gradient = lambda val: (0, val*2*255, 255) if val < 0.5 else (0, 255, (1-val)*2*255) #BGR
+		self.pattern_shape = detector.pattern.shape[:2]
 
 	def paint(self, img, line_thickness=1):
 		# footer = np.zeros((100, img.shape[1], 3), dtype=np.uint8)
@@ -26,7 +29,7 @@ class SensorDetectorResult:
 
 		for match, score in zip(self.matches, self.scores):
 			y, x = match
-			color = self._color_gradient(score)
+			color = color_gradient(score)
 
 			cv2.rectangle(canvas, 
 				(x, y), (x + pattern_w, y + pattern_h),
@@ -50,17 +53,16 @@ class SensorDetectorResult:
 
 
 class SensorDetector:
-	def __init__(self, pattern, params=None, **kwargs):
+	def __init__(self, pattern, params={}, **kwargs):
 		# Available parameters
-		self.preprocess = lambda x: x
+		self.preprocess = lambda img: img
 		self.pattern = pattern
 		self.match_method = cv2.TM_CCOEFF_NORMED
 		self.match_threshold = 0.8
 		self.clustering_bandwidth = 40
 
-		# Use either params dict or kwargs to seed parameters
-		if not params:
-			params = kwargs
+		# Use params dict and/or kwargs to seed parameters
+		params = {**params, **kwargs}
 
 		for k,v in params.items():
 			if k in self.__dict__:
@@ -116,4 +118,4 @@ class SensorDetector:
 		# cv2.imshow("pattern_proc", pattern_proc)
 		# cv2.imshow("img_proc", img_proc)
 
-		return SensorDetectorResult(self, matches, match_map)
+		return SensorDetectorResult(self, matches, match_map), img_proc

@@ -7,6 +7,10 @@ from detector import SensorDetector
 from preprocess import downscale
 from ui import TkUI
 
+def preprocess(img):
+	return img
+	# return cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
 def main():
 
 	PATH_IMAGE = "img/other/allsensors.png"
@@ -27,13 +31,7 @@ def main():
 
 	# img = img[:,200:]
 
-	detector = SensorDetector(pattern)
-
-	# onChange = lambda x: None # Do nothing function
-
-	# cv2.namedWindow(WINDOW_NAME)
-	# cv2.createTrackbar("match_threshold_percent", WINDOW_NAME, 70, 100, onChange)
-	# cv2.createTrackbar("clustering_bandwidth", WINDOW_NAME, 40, 100, onChange) #permille
+	detector = SensorDetector(pattern, preprocess=preprocess)
 
 	f = Figure()
 	# f.set_tight_layout(True)
@@ -44,9 +42,9 @@ def main():
 	ui.addSlider("match_threshold",     0.7, 0,   1, 0.01)
 	ui.addSlider("clustering_bandwidth", 40, 1, 100)
 
-	ax1 = f.add_subplot(1, 2, 1)
-	ax2 = f.add_subplot(1, 2, 2)
-	# ax3 = f.add_subplot(2, 2, 3)
+	ax1 = f.add_subplot(1, 3, 1)
+	ax2 = f.add_subplot(1, 3, 2)
+	ax3 = f.add_subplot(1, 3, 3)
 	# ax4 = f.add_subplot(2, 2, 4)
 
 	while True:
@@ -58,23 +56,28 @@ def main():
 			# Stopwatch execution of detector.detect
 			start_time = time()
 
-			matches = detector.detect(img)
+			matches, img_proc = detector.detect(img)
 
 			time_elapsed = time() - start_time
 			ui.table.set("Time elapsed", time_elapsed)
 
 			ui.table.set("Number of sensors", len(matches))
-			ui.table.set("R-squared", matches.rsquared)
 			ui.table.set("RSS", matches.rss)
+			ui.table.set("Avg error", matches.avg_error)
+			ui.table.set("Product of scores", matches.product_error)
 
 			# Display results
 			result = matches.paint(img)
 
-			img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+			img_proc_rgb = cv2.cvtColor(img_proc, cv2.COLOR_BGR2RGB)
 			result_rgb = cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
+			pattern_rgb = cv2.cvtColor(pattern, cv2.COLOR_BGR2RGB)
+			pattern_proc_rgb = cv2.cvtColor(detector.pattern_proc, cv2.COLOR_BGR2RGB)
 
-			ax1.imshow(img_rgb)
-			ax2.imshow(result_rgb)
+			ax1.imshow(result_rgb)
+			ax2.imshow(img_proc_rgb)
+			# ax3.imshow(pattern_rgb)
+			ax3.imshow(pattern_proc_rgb)
 			ui.updateFigure()
 
 		else:
