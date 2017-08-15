@@ -10,6 +10,8 @@ def downscale(img, downscale_factor):
 def canny(img, threshold_low, threshold_ratio=3, aperture=3):
 	return cv2.Canny(img, threshold_low, threshold_low*threshold_ratio, aperture)
 
+def adaptive_threshold(img, block_radius=5, c=7):
+	return cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, block_radius*2+1, c)
 
 # Demo
 if __name__ == "__main__":
