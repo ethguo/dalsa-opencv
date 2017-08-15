@@ -13,13 +13,15 @@ class SensorDetectorResult:
 		self.matches = matches
 		self.match_map = match_map
 
+		self.pattern_shape = np.array(pattern.shape[:2])
+
+		self.centers = self.matches + (self.pattern_shape // 2)
+
 		self.scores = match_map[tuple(np.transpose(matches))]
 		self.squared_errors = (1 - self.scores) ** 2
 		self.rss = np.sum(self.squared_errors)
 		self.avg_error = self.rss / len(self)
 		self.product_error = np.product(self.scores)
-
-		self.pattern_shape = pattern.shape[:2]
 
 	def paint(self, img, line_thickness=1):
 		# footer = np.zeros((100, img.shape[1], 3), dtype=np.uint8)

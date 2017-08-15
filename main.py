@@ -21,7 +21,7 @@ def main():
 
 	PATH_IMAGE = "img/calibration/img.png"
 	PATH_PATTERN = "img/calibration/img_pattern.png"
-	DOWNSCALE = 1
+	DOWNSCALE = 4
 	WINDOW_NAME = "calibration"
 
 	img = cv2.imread(PATH_IMAGE, cv2.IMREAD_COLOR)
@@ -80,14 +80,13 @@ def main():
 				result = matches.paint(img)
 
 			# img_proc_rgb = cv2.cvtColor(img_proc, cv2.COLOR_BGR2RGB)
-			# result_rgb = cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
+				result = cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
 			# pattern_rgb = cv2.cvtColor(pattern, cv2.COLOR_BGR2RGB)
 			# pattern_proc_rgb = cv2.cvtColor(pattern_proc, cv2.COLOR_BGR2RGB)
 
 				ax1.imshow(result)
 			ax2.imshow(img_proc)
 			ax3.imshow(pattern_proc)
-			# ax3.imshow(pattern_proc_rgb)
 			ui.updateFigure()
 
 		else:
