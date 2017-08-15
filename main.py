@@ -39,7 +39,7 @@ def main():
 
 	ui = TkUI(WINDOW_NAME)
 	ui.addTable()
-	ui.addFigure(f)
+	ui.setFigure(f)
 	ui.addSlider("match_threshold",     0.60, 0,   1, 0.01)
 	ui.addSlider("clustering_bandwidth", 40, 1, 100)
 	ui.addSlider("block_radius", 35, 1, 50, 1, int)
