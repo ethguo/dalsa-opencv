@@ -29,16 +29,39 @@ class PerspectiveTransform:
 		return str(self.matrix)
 
 
-def getPerspectiveTransform(src_img, src_points, output_size=(500, 500)):
+def getPerspectiveTransform(src_img, src_points, output_shape):
+	"""Summary
+	
+	Args:
+	    src_img (TYPE): Description
+	    src_points (TYPE): Description
+	    output_shape (tuple): (height, width) of final image.
+	
+	Returns:
+	    TYPE: Description
+	"""
+	output_shape = (output_shape[1], output_shape[0])
+	src_points = np.flip(src_points, axis=1)
+	
 	img_corners = fourCorners(src_img.shape[:2])
+
+	sum_ = np.sum(src_points, axis=1)	
+	diff = np.diff(src_points, axis=1)
+	src_ordered = np.array((
+		np.argmin(sum_),
+		np.argmin(diff),
+		np.argmax(sum_),
+		np.argmax(diff)
+		), dtype=np.float32)
 
 	dists = np.array([np.linalg.norm(img_corner - src_points, axis=1) for img_corner in img_corners])
 	correspondences = np.argmin(dists, axis=1) # img_corner i corresponds to the src_point at correspondences[i]
 	assert np.unique(correspondences).shape[0] == 4
 
-	src_points = np.array([src_points[i][::-1] for i in correspondences], dtype=np.float32)
-	dst_points = fourCorners(output_size)
-	print(src_points, dst_points)
-	matrix = cv2.getPerspectiveTransform(src_points, dst_points)
+	src_points = np.array([src_points[i] for i in correspondences], dtype=np.float32)
+	dst = fourCorners(output_shape)
+	# print(src_points)
+	# print(dst)
+	matrix = cv2.getPerspectiveTransform(src_ordered, dst)
 
-	return PerspectiveTransform(matrix, output_size)
+	return PerspectiveTransform(matrix, output_shape)

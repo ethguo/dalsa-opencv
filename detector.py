@@ -20,7 +20,7 @@ class SensorDetectorResult:
 		self.avg_error = self.rss / len(self)
 		self.product_error = np.product(self.scores)
 
-	def paint(self, img, line_thickness=1):
+	def paint(self, img, line_thickness=2):
 		# footer = np.zeros((100, img.shape[1], 3), dtype=np.uint8)
 		# canvas = np.concatenate([img, footer])
 		canvas = np.copy(img)

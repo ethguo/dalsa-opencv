@@ -43,13 +43,13 @@ def main():
 	ui.addFigure(f)
 	ui.addSlider("match_threshold",     0.60, 0,   1, 0.01)
 	ui.addSlider("clustering_bandwidth", 40, 1, 100)
-	ui.addSlider("block_radius", 35, 1, 50, 1, int)
+	ui.addSlider("block_radius", 35, 1, 200, 1, int)
 	ui.addSlider("c", 20, -50, 50, 1, int)
 
-	ax1 = f.add_subplot(1, 2, 1)
-	ax2 = f.add_subplot(1, 2, 2)
-	# ax3 = f.add_subplot(1, 3, 3)
-	# ax4 = f.add_subplot(2, 2, 4)
+	ax1 = f.add_subplot(2, 2, 1)
+	ax2 = f.add_subplot(2, 2, 2)
+	ax3 = f.add_subplot(2, 2, 3)
+	ax4 = f.add_subplot(2, 2, 4)
 
 	while True:
 
@@ -62,15 +62,18 @@ def main():
 			img_proc = preprocess(img, block_radius, c)
 			pattern_proc = preprocess(pattern, block_radius, c)
 
+			aximshow(ax3, img_proc)
+			aximshow(ax4, pattern_proc)
+
 			# Stopwatch execution of detector.detect
 			t0 = time()
 
 			matches = detector.detect(img_proc, pattern_proc)
 
-			ui.table.set("Detector time", time() - t0)
-			ui.table.set("Matches", np.array(matches))
-
 			if matches:
+				ui.table.set("Detector time", time() - t0)
+				ui.table.set("Matches", np.array(matches))
+
 				if len(matches) == 4:
 					t1 = time()
 
@@ -83,8 +86,8 @@ def main():
 
 					aximshow(ax2, result)
 
-			img1 = matches.paint(img)
-			aximshow(ax1, img1)
+				img1 = matches.paint(img)
+				aximshow(ax1, img1)
 			ui.updateFigure()
 
 		else:

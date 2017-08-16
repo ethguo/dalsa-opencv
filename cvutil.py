@@ -1,6 +1,13 @@
 import cv2
 import numpy as np
 
+def aximshow(ax, img, cmap="gray"):
+	if img.ndim == 3 and img.shape[2] == 3:
+		img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+		ax.imshow(img)
+	else:
+		ax.imshow(img, cmap=cmap)
+
 def getHsv(img):
 	img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 	img_hsv_channels = cv2.split(img_hsv)
@@ -50,8 +57,5 @@ def fourCorners(*args):
 		(a[0], a[1]),
 		(a[0], b[1]),
 		(b[0], a[1]),
-		(b[0], b[1]) ), dtype=np.float32)
-
-def aximshow(ax, img):
-	img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-	ax.imshow(img)
+		(b[0], b[1])
+		), dtype=np.float32)
