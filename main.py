@@ -3,13 +3,14 @@ import numpy as np
 from matplotlib.figure import Figure
 from time import sleep, time
 
+from cvutil import downscale, adaptiveThreshold, aximshow
 from detector import SensorDetector
-from cvutil import downscale, adaptive_threshold, get_transform_matrix
+from transform import getPerspectiveTransform
 from ui import TkUI
 
 def preprocess(img, block_radius=5, c=7):
 	img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-	img = adaptive_threshold(img, block_radius, c)
+	img = adaptiveThreshold(img, block_radius, c)
 	return img
 
 def main():
@@ -21,7 +22,7 @@ def main():
 
 	PATH_IMAGE = "img/calibration/img.png"
 	PATH_PATTERN = "img/calibration/img_pattern.png"
-	DOWNSCALE = 4
+	DOWNSCALE = 1
 	WINDOW_NAME = "calibration"
 
 	img = cv2.imread(PATH_IMAGE, cv2.IMREAD_COLOR)
@@ -45,9 +46,9 @@ def main():
 	ui.addSlider("block_radius", 35, 1, 50, 1, int)
 	ui.addSlider("c", 20, -50, 50, 1, int)
 
-	ax1 = f.add_subplot(1, 3, 1)
-	ax2 = f.add_subplot(1, 3, 2)
-	ax3 = f.add_subplot(1, 3, 3)
+	ax1 = f.add_subplot(1, 2, 1)
+	ax2 = f.add_subplot(1, 2, 2)
+	# ax3 = f.add_subplot(1, 3, 3)
 	# ax4 = f.add_subplot(2, 2, 4)
 
 	while True:
@@ -69,30 +70,29 @@ def main():
 			ui.table.set("Detector time", time() - t0)
 
 			if matches:
-				t1 = time()
+				if len(matches) == 4:
+					ui.table.set("Matches", np.array(matches))
+					t1 = time()
 
-				get_transform_matrix()
+					transform = getPerspectiveTransform(img, np.array(matches), (400, 660))
 
-				ui.table.set("Transform time", time() - t0)
+					result = transform(img)
+					print(img.shape, img.dtype)
 
-				ui.table.set("Number of sensors", len(matches))
-				ui.table.set("RSS", matches.rss)
-				ui.table.set("Avg error", matches.avg_error)
-				ui.table.set("Product of scores", matches.product_error)
+					ui.table.set("Transform matrix", transform.matrix)
+					ui.table.set("Transform time", time() - t1)
+
+					aximshow(ax1, img)
+					aximshow(ax2, result)
+					ui.updateFigure()
 
 				# Display results
-				result = matches.paint(img)
+				img = matches.paint(img)
 
 			# img_proc_rgb = cv2.cvtColor(img_proc, cv2.COLOR_BGR2RGB)
-				result = cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
+				# result = cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
 			# pattern_rgb = cv2.cvtColor(pattern, cv2.COLOR_BGR2RGB)
 			# pattern_proc_rgb = cv2.cvtColor(pattern_proc, cv2.COLOR_BGR2RGB)
-
-				ax1.imshow(result)
-
-			ax2.imshow(img_proc)
-			ax3.imshow(pattern_proc)
-			ui.updateFigure()
 
 		else:
 			sleep(1/60)

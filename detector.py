@@ -42,14 +42,20 @@ class SensorDetectorResult:
 		return canvas 	
 
 	# Magic methods to allow it to behave like a sequence
-	def __len__(self):
-		return len(self.matches)
-
 	def __getitem__(self, key):
-		return self.matches[key]
+		return self.centers[key]
 
 	def __iter__(self):
-		return iter(self.matches)
+		return iter(self.centers)
+
+	def __len__(self):
+		return len(self.centers)
+
+	def __repr__(self):
+		return repr(self.centers)
+
+	def __str__(self):
+		return str(self.centers)
 
 
 class SensorDetector:
@@ -70,7 +76,7 @@ class SensorDetector:
 
 		self.clusterer = MeanShift(self.clustering_bandwidth)
 
-	def _best_matches(self, match_map, candidates, labels):
+	def _bestMatches(self, match_map, candidates, labels):
 		num_matches = len(np.unique(labels))
 		min_errors = np.zeros(num_matches, dtype=match_map.dtype)
 		best_matches = np.zeros((num_matches, 2), dtype=candidates.dtype)
@@ -96,7 +102,7 @@ class SensorDetector:
 		labels = self.clusterer.labels_
 		# centers = self.clusterer.cluster_centers_
 
-		matches = self._best_matches(match_map, candidates, labels)
+		matches = self._bestMatches(match_map, candidates, labels)
 
 		# matches = np.int_(centers)
 

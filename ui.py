@@ -1,3 +1,4 @@
+import numpy as np
 import tkinter as tk
 from tkinter import ttk
 import tkinter.font as tkFont
@@ -84,7 +85,7 @@ class TkTable:
 	def __init__(self, master, show_delta=True):
 		self.master = master
 		self.show_delta = show_delta
-		self.names = []
+		self.names = set()
 
 		headings = ("Name", "Value")
 		if show_delta:
@@ -92,7 +93,7 @@ class TkTable:
 			self.last_values = {}
 
 		self.container = ttk.Frame(self.master)
-		self.container.pack(side=tk.TOP, fill=tk.X)
+		self.container.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 		
 		self.tree = ttk.Treeview(self.container, columns=headings, show="headings")
 		vsb = ttk.Scrollbar(self.container, orient="vertical", command=self.tree.yview)
@@ -107,16 +108,37 @@ class TkTable:
 		for col in headings:
 			self.tree.heading(col, text=col.title())
 
+		self.tree.tag_configure("ndarray_line", font="Courier 9 bold")
+
+
 	def set(self, name, value):
-		if name not in self.names:
-			self.tree.insert("", "end", name, values=(name, value))
-			self.names.append(name)
-			if self.show_delta:
-				self.last_values[name] = value
+		if type(value) == np.ndarray and value.shape[0] < 30:
+			if name not in self.names:
+				self._insertArray(name, value)
+
+			elif not (value == self.last_values[name]).all():
+				tree.delete(name)
+				self._insertArray(name, value)
+
 		else:
-			self.tree.set(name, "Value", value)
-			if self.show_delta:
-				delta = value - self.last_values[name]
-				self.last_values[name] = value
-				text = "%+d"%delta if type(delta) == int else "%+f"%delta
-				self.tree.set(name, "Delta", text)
+			if name not in self.names:
+				self.tree.insert("", "end", name, values=(name, value))
+				self.names.add(name)
+			else:
+				self.tree.set(name, "Value", value)
+				if self.show_delta:
+					delta = value - self.last_values[name]
+					text = "%+d"%delta if type(delta) == int else "%+f"%delta
+					self.tree.set(name, "Delta", text)
+
+		self.last_values[name] = value
+
+	def _insertArray(self, name, array):
+		head = "ndarray(%s, %s)" % (array.shape, array.dtype)
+		self.tree.insert("", "end", name, values=(name, head), open=True)
+
+		lines = str(array).split("\n")
+		for i, line in enumerate(lines):
+			self.tree.insert(name, "end", name + "~" + str(i), values=("", line), tags="ndarray_line")
+
+		self.names.add(name)
