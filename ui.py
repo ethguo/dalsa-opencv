@@ -47,7 +47,7 @@ class TkUI:
 		row = len(self.sliders)
 
 		label = tk.Label(self.sliders_grid, text=name)
-		label.grid(row=row, column=0)
+		label.grid(row=row, column=0, sticky=tk.N+tk.E)
 
 		slider = tk.Scale(self.sliders_grid, variable=tk_variable, from_=from_, to=to, resolution=resolution, orient=tk.HORIZONTAL, **kwargs)
 		slider.grid(row=row, column=1, sticky=tk.W+tk.E)
@@ -108,17 +108,16 @@ class TkTable:
 		for col in headings:
 			self.tree.heading(col, text=col.title())
 
+		self.tree.column("Name", stretch=False)
+		if show_delta:
+			self.tree.column("Delta", stretch=False)
+
 		self.tree.tag_configure("ndarray_line", font="Courier 9 bold")
 
 
 	def set(self, name, value):
-		if type(value) == np.ndarray and value.shape[0] < 30:
-			if name not in self.names:
-				self._insertArray(name, value)
-
-			elif not (value == self.last_values[name]).all():
-				tree.delete(name)
-				self._insertArray(name, value)
+		if type(value) == np.ndarray:
+			self._insertArray(name, value)
 
 		else:
 			if name not in self.names:
@@ -134,11 +133,19 @@ class TkTable:
 		self.last_values[name] = value
 
 	def _insertArray(self, name, array):
-		head = "ndarray(%s, %s)" % (array.shape, array.dtype)
-		self.tree.insert("", "end", name, values=(name, head), open=True)
+		value0 = "ndarray(%s, %s)" % (array.shape, array.dtype)
+
+		if name not in self.names:
+			self.tree.insert("", "end", name, values=(name, value0), open=True)
+			self.names.add(name)
+		elif np.any(array != self.last_values[name]):
+			self.tree.set(name, "Value", value0)
+
+			old_lines = self.tree.get_children(name)
+			self.tree.delete(*old_lines)
+		else:
+			return
 
 		lines = str(array).split("\n")
 		for i, line in enumerate(lines):
 			self.tree.insert(name, "end", name + "~" + str(i), values=("", line), tags="ndarray_line")
-
-		self.names.add(name)

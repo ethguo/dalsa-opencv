@@ -68,31 +68,24 @@ def main():
 			matches = detector.detect(img_proc, pattern_proc)
 
 			ui.table.set("Detector time", time() - t0)
+			ui.table.set("Matches", np.array(matches))
 
 			if matches:
 				if len(matches) == 4:
-					ui.table.set("Matches", np.array(matches))
 					t1 = time()
 
-					transform = getPerspectiveTransform(img, np.array(matches), (400, 660))
+					transform = getPerspectiveTransform(img, matches, (400, 660))
 
 					result = transform(img)
-					print(img.shape, img.dtype)
 
-					ui.table.set("Transform matrix", transform.matrix)
 					ui.table.set("Transform time", time() - t1)
+					ui.table.set("Transform matrix", transform.matrix)
 
-					aximshow(ax1, img)
 					aximshow(ax2, result)
-					ui.updateFigure()
 
-				# Display results
-				img = matches.paint(img)
-
-			# img_proc_rgb = cv2.cvtColor(img_proc, cv2.COLOR_BGR2RGB)
-				# result = cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
-			# pattern_rgb = cv2.cvtColor(pattern, cv2.COLOR_BGR2RGB)
-			# pattern_proc_rgb = cv2.cvtColor(pattern_proc, cv2.COLOR_BGR2RGB)
+			img1 = matches.paint(img)
+			aximshow(ax1, img1)
+			ui.updateFigure()
 
 		else:
 			sleep(1/60)
