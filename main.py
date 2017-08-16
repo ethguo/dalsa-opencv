@@ -4,7 +4,7 @@ from matplotlib.figure import Figure
 from time import sleep, time
 
 from detector import SensorDetector
-from preprocess import downscale, adaptive_threshold
+from cvutil import downscale, adaptive_threshold, get_transform_matrix
 from ui import TkUI
 
 def preprocess(img, block_radius=5, c=7):
@@ -62,14 +62,18 @@ def main():
 			pattern_proc = preprocess(pattern, block_radius, c)
 
 			# Stopwatch execution of detector.detect
-			start_time = time()
+			t0 = time()
 
 			matches = detector.detect(img_proc, pattern_proc)
 
-			time_elapsed = time() - start_time
-			ui.table.set("Time elapsed", time_elapsed)
+			ui.table.set("Detector time", time() - t0)
 
 			if matches:
+				t1 = time()
+
+				get_transform_matrix()
+
+				ui.table.set("Transform time", time() - t0)
 
 				ui.table.set("Number of sensors", len(matches))
 				ui.table.set("RSS", matches.rss)
@@ -85,6 +89,7 @@ def main():
 			# pattern_proc_rgb = cv2.cvtColor(pattern_proc, cv2.COLOR_BGR2RGB)
 
 				ax1.imshow(result)
+
 			ax2.imshow(img_proc)
 			ax3.imshow(pattern_proc)
 			ui.updateFigure()

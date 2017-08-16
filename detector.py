@@ -3,9 +3,6 @@ import numpy as np
 from sklearn.cluster import MeanShift, estimate_bandwidth
 import warnings
 
-from preprocess import *
-from hsv import *
-
 color_gradient = lambda val: (0, val*2*255, 255) if val < 0.5 else (0, 255, (1-val)*2*255) #BGR
 
 class SensorDetectorResult:
