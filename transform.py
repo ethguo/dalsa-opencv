@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from cvutil import fourCorners
+from cvutils import fourCorners
 
 class PerspectiveTransform:
 	def __init__(self, matrix, shape):

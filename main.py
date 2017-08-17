@@ -4,7 +4,7 @@ from matplotlib.figure import Figure
 from matplotlib.patches import Circle, Rectangle
 from time import sleep, time
 
-from cvutil import downscale, adaptiveThreshold, aximshow
+from cvutils import downscale, adaptiveThreshold, aximshow
 from detector import SensorDetector
 from transform import getPerspectiveTransform
 from ui import TkUI
