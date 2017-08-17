@@ -8,28 +8,43 @@ from detector import SensorDetector
 from transform import getPerspectiveTransform
 from ui import TkUI
 
+# PATH_IMAGE = "img/other/allsensors.png"
+# PATH_PATTERN = "img/other/allsensors_pattern.png"
+# DOWNSCALE = 1
+# WINDOW_NAME = "tray0"
+
+PATH_IMAGE = "img/calibration/img.png"
+PATH_PATTERN = "img/calibration/img_pattern.png"
+DOWNSCALE_IMAGE = 4
+DOWNSCALE_PATTERN = 1
+WINDOW_NAME = "calibration"
+
+TRAY_WIDTH = 330 * 2
+TRAY_HEIGHT = 200 * 2
+SLOT_WIDTH = 32 * 2
+SLOT_HEIGHT = 26 * 2
+
 def preprocess(img, block_radius=5, c=7):
 	img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 	img = adaptiveThreshold(img, block_radius, c)
 	return img
 
+def segmentTray(img):
+	p0 = np.array((TRAY_WIDTH - SLOT_WIDTH * 7, TRAY_HEIGHT - SLOT_HEIGHT * 7)) / 2
+
+	for j in range(7):
+		for i in range(7):
+			p1 = np.int_(p0 + (SLOT_WIDTH * i, SLOT_HEIGHT * j))
+			p2 = np.int_(p1 + (SLOT_WIDTH, SLOT_HEIGHT))
+
+			cv2.rectangle(img, tuple(p1), tuple(p2), (0, 255, 0), 2)
+
 def main():
-
-	# PATH_IMAGE = "img/other/allsensors.png"
-	# PATH_PATTERN = "img/other/allsensors_pattern.png"
-	# DOWNSCALE = 1
-	# WINDOW_NAME = "tray0"
-
-	PATH_IMAGE = "img/calibration/img.png"
-	PATH_PATTERN = "img/calibration/img_pattern.png"
-	DOWNSCALE = 1
-	WINDOW_NAME = "calibration"
-
 	img = cv2.imread(PATH_IMAGE, cv2.IMREAD_COLOR)
 	pattern = cv2.imread(PATH_PATTERN, cv2.IMREAD_COLOR)
 
-	img = downscale(img, DOWNSCALE)
-	pattern = downscale(pattern, DOWNSCALE)
+	img = downscale(img, DOWNSCALE_IMAGE)
+	pattern = downscale(pattern, DOWNSCALE_PATTERN)
 
 	# img = img[:,200:]
 
@@ -43,7 +58,7 @@ def main():
 	ui.addFigure(f)
 	ui.addSlider("match_threshold",     0.60, 0,   1, 0.01)
 	ui.addSlider("clustering_bandwidth", 40, 1, 100)
-	ui.addSlider("block_radius", 35, 1, 200, 1, int)
+	ui.addSlider("block_radius", 50, 1, 200, 1, int)
 	ui.addSlider("c", 20, -50, 50, 1, int)
 
 	ax1 = f.add_subplot(2, 2, 1)
@@ -77,12 +92,19 @@ def main():
 				if len(matches) == 4:
 					t1 = time()
 
-					transform = getPerspectiveTransform(img, matches, (400, 660))
+					transform = getPerspectiveTransform(img, matches, (TRAY_HEIGHT, TRAY_WIDTH))
 
 					result = transform(img)
 
 					ui.table.set("Transform time", time() - t1)
 					ui.table.set("Transform matrix", transform.matrix)
+
+					segmentTray(result)
+
+					# p1 = (int(TRAY_WIDTH - SLOT_WIDTH * 7), int(TRAY_HEIGHT - SLOT_HEIGHT * 7))
+					# p2 = (int(TRAY_WIDTH - SLOT_WIDTH * 5), int(TRAY_HEIGHT - SLOT_HEIGHT * 5))
+					# cv2.rectangle(result, p1, p2, (0, 255, 0), 1)
+					# cv2.rectangle(result, (136, 41), (524, 359), (0, 255, 0), 2)
 
 					aximshow(ax2, result)
 
