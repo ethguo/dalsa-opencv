@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from matplotlib.figure import Figure
+from matplotlib.patches import Circle, Rectangle
 from time import sleep, time
 
 from cvutil import downscale, adaptiveThreshold, aximshow
@@ -19,25 +20,30 @@ DOWNSCALE_IMAGE = 4
 DOWNSCALE_PATTERN = 1
 WINDOW_NAME = "calibration"
 
+# Pixels 2x scale
 TRAY_WIDTH = 330 * 2
 TRAY_HEIGHT = 200 * 2
-SLOT_WIDTH = 32 * 2
-SLOT_HEIGHT = 26 * 2
+SLOT_WIDTH = 32.3 * 2
+SLOT_HEIGHT = 26.5 * 2
+TRAY_ROWS = 7
+TRAY_COLS = 7
 
 def preprocess(img, block_radius=5, c=7):
 	img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 	img = adaptiveThreshold(img, block_radius, c)
 	return img
 
-def segmentTray(img):
-	p0 = np.array((TRAY_WIDTH - SLOT_WIDTH * 7, TRAY_HEIGHT - SLOT_HEIGHT * 7)) / 2
+def segmentTray(img, ax):
+	x0 = (TRAY_WIDTH - SLOT_WIDTH * TRAY_COLS) / 2
+	y0 = (TRAY_HEIGHT - SLOT_HEIGHT * TRAY_ROWS) / 2
 
-	for j in range(7):
-		for i in range(7):
-			p1 = np.int_(p0 + (SLOT_WIDTH * i, SLOT_HEIGHT * j))
-			p2 = np.int_(p1 + (SLOT_WIDTH, SLOT_HEIGHT))
+	for j in range(TRAY_ROWS):
+		for i in range(TRAY_COLS):
+			x = int(x0 + SLOT_WIDTH * i)
+			y = int(y0 + SLOT_HEIGHT * j)
 
-			cv2.rectangle(img, tuple(p1), tuple(p2), (0, 255, 0), 2)
+			rect = Rectangle((x, y), SLOT_WIDTH, SLOT_HEIGHT, alpha=1, fill=False, color=(1, 0, 1))
+			ax.add_patch(rect)
 
 def main():
 	img = cv2.imread(PATH_IMAGE, cv2.IMREAD_COLOR)
@@ -99,7 +105,7 @@ def main():
 					ui.table.set("Transform time", time() - t1)
 					ui.table.set("Transform matrix", transform.matrix)
 
-					segmentTray(result)
+					segmentTray(result, ax2)
 
 					# p1 = (int(TRAY_WIDTH - SLOT_WIDTH * 7), int(TRAY_HEIGHT - SLOT_HEIGHT * 7))
 					# p2 = (int(TRAY_WIDTH - SLOT_WIDTH * 5), int(TRAY_HEIGHT - SLOT_HEIGHT * 5))
@@ -108,8 +114,9 @@ def main():
 
 					aximshow(ax2, result)
 
-				img1 = matches.paint(img)
-				aximshow(ax1, img1)
+				aximshow(ax1, img)
+				matches.axpaint(ax1)
+				
 			ui.updateFigure()
 
 		else:

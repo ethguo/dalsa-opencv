@@ -1,7 +1,6 @@
 import numpy as np
 import tkinter as tk
-from tkinter import ttk
-import tkinter.font as tkFont
+import tkinter.ttk as ttk
 
 import matplotlib
 matplotlib.use('TkAgg')

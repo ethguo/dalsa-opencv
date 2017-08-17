@@ -1,9 +1,11 @@
 import cv2
 import numpy as np
-from sklearn.cluster import MeanShift, estimate_bandwidth
 import warnings
+from matplotlib.patches import Circle, Rectangle
+from sklearn.cluster import MeanShift, estimate_bandwidth
 
-color_gradient = lambda val: (0, val*2*255, 255) if val < 0.5 else (0, 255, (1-val)*2*255) #BGR
+color_gradient_bgr = lambda val: (0, val*2*255, 255) if val < 0.5 else (0, 255, (1-val)*2*255)
+color_gradient_rgb = lambda val: (1, val*2, 0) if val < 0.5 else ((1-val)*2, 1, 0)
 
 class SensorDetectorResult:
 	def __init__(self, detector, matches, match_map, pattern):
@@ -29,7 +31,7 @@ class SensorDetectorResult:
 
 		for match, score in zip(self.matches, self.scores):
 			y, x = match
-			color = color_gradient(score)
+			color = color_gradient_bgr(score)
 
 			cv2.rectangle(canvas, 
 				(x, y), (x + pattern_w, y + pattern_h),
@@ -39,7 +41,20 @@ class SensorDetectorResult:
 				(x + pattern_w//2, y + pattern_h//2), radius=2*line_thickness,
 				color=color, thickness=-1)
 
-		return canvas 	
+		return canvas
+
+	def axpaint(self, ax):
+		pattern_h, pattern_w = self.pattern_shape
+
+		for match, score in zip(self.matches, self.scores):
+			y, x = match
+			color = color_gradient_rgb(score)
+
+			rect = Rectangle((x, y), pattern_w, pattern_h, alpha=1, fill=False, color=color)
+			point = Circle((x + pattern_w//2, y + pattern_h//2), radius=2, color=color)
+
+			ax.add_patch(rect)
+			ax.add_patch(point)
 
 	# Magic methods to allow it to behave like a sequence
 	def __getitem__(self, key):
