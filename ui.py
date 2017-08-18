@@ -33,13 +33,23 @@ class TkUI:
 		self.table = TkTable(self.secondary_window or self.root, show_delta)
 
 	# var_type is int or float
-	def addSlider(self, name, initial_value=0, from_=0, to=100, resolution=1, var_type=float, **kwargs):
-		if var_type in (int, "int"):
-			tk_variable = tk.IntVar()
-		elif var_type in (float, "float"):
-			tk_variable = tk.DoubleVar()
+	def addSlider(self, name, initial_value=0, from_=0, to=100, resolution=1, var_type=None, **kwargs):
+		if var_type:
+			if var_type in (int, "int"):
+				tk_variable = tk.IntVar()
+			elif var_type in (float, "float"):
+				tk_variable = tk.DoubleVar()
+			else:
+				raise ValueError("var_type " + str(var_type) + " not supported.")
 		else:
-			raise ValueError("var_type " + str(var_type) + " not supported.")
+			if type(initial_value) == float \
+					or type(from_) == float \
+					or type(to) == float \
+					or type(resolution) == float:
+				tk_variable = tk.DoubleVar()
+			else:
+				tk_variable = tk.IntVar()
+
 
 		tk_variable.set(initial_value)
 
