@@ -4,7 +4,7 @@ from matplotlib.figure import Figure
 from time import sleep, time
 
 from cvutils import downscale, adaptiveThreshold, aximshow
-from detector import SensorDetector
+from detector import CalibrationDetector
 from transform import getPerspectiveTransform
 from tray import getTrayDef, processTray, drawGrid
 from ui import TkUI
@@ -15,7 +15,7 @@ from ui import TkUI
 # WINDOW_NAME = "tray0"
 
 PATH_IMAGE = "img/calibration/img.png"
-PATH_PATTERN = "img/calibration/img_pattern.png"
+PATH_PATTERN = "img/calibration/img_calibration.png"
 DOWNSCALE_IMAGE = 4
 DOWNSCALE_PATTERN = 1
 WINDOW_NAME = "calibration"
@@ -38,7 +38,7 @@ def main():
 
 	# img = img[:,200:]
 
-	detector = SensorDetector()
+	calibration_detector = CalibrationDetector(match_threshold=0.6, clustering_bandwidth=40) # Used to detect calibration points
 
 	f = Figure()
 	# f.set_tight_layout(True)
@@ -50,17 +50,19 @@ def main():
 	ui.addSlider("clustering_bandwidth", 40, 1, 100)
 	ui.addSlider("block_radius", 50, 1, 200, 1, int)
 	ui.addSlider("c", 20, -50, 50, 1, int)
+	ui.addSlider("c", 20, -50, 50, 1, int)
 
 	# ax1 = f.add_subplot(2, 2, 1)
 	# ax2 = f.add_subplot(2, 2, 2)
 	# ax3 = f.add_subplot(2, 2, 3)
 	# ax4 = f.add_subplot(2, 2, 4)
-	ax2 = f.add_subplot(111)
+	ax1 = f.add_subplot(121)
+	ax2 = f.add_subplot(122)
 
 	while True:
 
-		detector.match_threshold, changed1 = ui.getSlider("match_threshold")
-		detector.clustering_bandwidth, changed2 = ui.getSlider("clustering_bandwidth")
+		calibration_detector.match_threshold, changed1 = ui.getSlider("match_threshold")
+		calibration_detector.clustering_bandwidth, changed2 = ui.getSlider("clustering_bandwidth")
 		block_radius, changed3 = ui.getSlider("block_radius")
 		c, changed4 = ui.getSlider("c")
 
@@ -71,10 +73,10 @@ def main():
 			# aximshow(ax3, img_proc)
 			# aximshow(ax4, pattern_proc)
 
-			# Stopwatch execution of detector.detect
+			# Stopwatch execution of calibration_detector.detect
 			t0 = time()
 
-			matches = detector.detect(img_proc, pattern_proc)
+			matches = calibration_detector.detect(img_proc, pattern_proc)
 
 			if matches:
 				ui.table.set("Detector time", time() - t0)
@@ -90,7 +92,8 @@ def main():
 					ui.table.set("Transform time", time() - t1)
 					ui.table.set("Transform matrix", transform.matrix)
 
-					processTray(img_transformed, tray)
+					result = processTray(img_transformed, tray)
+					aximshow(ax1, result)
 					drawGrid(ax2, tray)
 
 					# p1 = (int(TRAY_WIDTH - SLOT_WIDTH * 7), int(TRAY_HEIGHT - SLOT_HEIGHT * 7))

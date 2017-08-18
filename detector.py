@@ -7,7 +7,7 @@ from sklearn.cluster import MeanShift, estimate_bandwidth
 color_gradient_bgr = lambda val: (0, val*2*255, 255) if val < 0.5 else (0, 255, (1-val)*2*255)
 color_gradient_rgb = lambda val: (1, val*2, 0) if val < 0.5 else ((1-val)*2, 1, 0)
 
-class SensorDetectorResult:
+class DetectorResult:
 	def __init__(self, detector, matches, match_map, pattern):
 		self.matches = matches
 		self.match_map = match_map
@@ -73,15 +73,15 @@ class SensorDetectorResult:
 		return str(self.centers)
 
 
-class SensorDetector:
+class CalibrationDetector:
 	def __init__(self, params={}, **kwargs):
 		# Available parameters
 		self.match_method = cv2.TM_CCOEFF_NORMED
 		self.match_threshold = 0.8
 		self.clustering_bandwidth = 40
 
-		# Use params dict and/or kwargs to seed parameters
-		params = {**params, **kwargs}
+		# Combine params and kwargs -- Use params dict and/or kwargs to seed parameters
+		params.update(kwargs)
 
 		for k,v in params.items():
 			if k in self.__dict__:
@@ -121,4 +121,4 @@ class SensorDetector:
 
 		# matches = np.int_(centers)
 
-		return SensorDetectorResult(self, matches, match_map, pattern)
+		return DetectorResult(self, matches, match_map, pattern)
