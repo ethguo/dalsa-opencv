@@ -27,8 +27,11 @@ def downscale(img, downscale_factor):
 	output = cv2.resize(img, img_dsize, interpolation=cv2.INTER_AREA)
 	return output
 
+def blur(img, kernel_size=5):
+	return cv2.GaussianBlur(img, (kernel_size, kernel_size))
+
 def canny(img, threshold_low, threshold_ratio=3, gaussian_kernel_size=5, sobel_kernel_size=3):
-	img = cv2.GaussianBlur(img, (gaussian_kernel_size, gaussian_kernel_size))
+	img = blur(img, gaussian_kernel_size)
 	img = cv2.Canny(img, threshold_low, threshold_low*threshold_ratio, sobel_kernel_size)
 	return img
 
