@@ -28,7 +28,6 @@ class PerspectiveTransform:
 	def __str__(self):
 		return str(self.matrix)
 
-
 def getPerspectiveTransform(src_img, src_points, output_shape):
 	"""Gets the transform matrix that will map the 4 points `src_points` to the four corners of a flat plane of shape `output_shape`.
 	
@@ -41,7 +40,7 @@ def getPerspectiveTransform(src_img, src_points, output_shape):
 	    PerspectiveTransform: `PerspectiveTransform` object encapsulating the resulting transform matrix.
 	"""
 	output_shape = (output_shape[1], output_shape[0])
-	src_points = np.flip(src_points, axis=1)
+	# src_points = np.flip(src_points, axis=1)
 	
 	# Determine which input points correspond to which of the 4 corners
 	img_corners = fourCorners(src_img.shape[:2])
