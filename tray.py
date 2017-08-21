@@ -1,22 +1,20 @@
-import cv2
-import numpy as np
 from matplotlib.patches import Circle, Rectangle
-from yaml import safe_load, YAMLObject
 from detector import CalibrationDetector
+from config import loadYAML
 
 class TrayDefinition:
-	def __init__(self, entry, scale=1):
-		self.entry = entry
+	def __init__(self, data, scale=1):
+		self.data = data
 		self.scale = scale
 
-		self.name = entry["name"]
-		self.rows = entry["tray"]["rows"]
-		self.cols = entry["tray"]["cols"]
+		self.name = data.name
+		self.rows = data.tray.rows
+		self.cols = data.tray.cols
 
-		self.width = entry["tray"]["width"] * scale
-		self.height = entry["tray"]["height"] * scale
-		self.cell_width = entry["cell"]["width"] * scale
-		self.cell_height = entry["cell"]["height"] * scale
+		self.width = data.tray.width * scale
+		self.height = data.tray.height * scale
+		self.cell_width = data.cell.width * scale
+		self.cell_height = data.cell.height * scale
 
 		self.x0 = (self.width - self.cell_width * self.cols) / 2
 		self.y0 = (self.height - self.cell_height * self.rows) / 2
@@ -58,9 +56,8 @@ class TrayDefinition:
 
 
 def getTrayDef(name, scale=1):
-	trays_file = open("trays.yml")
-	trays_data = safe_load(trays_file)
-
-	for entry in trays_data:
-		if entry["name"] == name:
-			return TrayDefinition(entry, scale)
+	trays_data = loadYAML("trays.yml")
+	
+	for data in trays_data:
+		if data.name == name:
+			return TrayDefinition(data, scale)

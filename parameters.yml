@@ -1,0 +1,25 @@
+image:
+  path: img/calibration/img1.png
+  scale: 0.25
+calibration_pattern:
+  path: img/calibration/calibration_320.png
+  scale: 0.25
+sensor_pattern:
+  path: img/calibration/img_pattern.png
+  scale: 0.25
+
+tray:
+  name: qvga_7x7
+  scale: 2
+
+calibration:
+  preprocessing:
+    block_radius: 50
+    c: 20
+  detector:
+    match_threshold: 0.5
+    clustering_bandwidth: 40
+
+sensors:
+  detector:
+    match_threshold: 0.25

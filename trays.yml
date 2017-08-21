@@ -1,3 +1,4 @@
+# All measurements in mm
 - name: qvga_7x7
   tray:
     width: 330
