@@ -1,13 +1,12 @@
 import cv2
 import numpy as np
 from matplotlib.figure import Figure
-from matplotlib.patches import Circle, Rectangle
 from time import sleep, time
 
 from cvutils import downscale, adaptiveThreshold, aximshow
 from detector import CalibrationDetector, SensorDetector
 from transform import getPerspectiveTransform
-from tray import getTrayDef, drawGrid, getCells
+from tray import getTrayDef
 from ui import TkUI
 
 # PATH_IMAGE = "img/other/allsensors.png"
@@ -87,6 +86,10 @@ def main():
 			if calibration_matches:
 				ui.setTableRow("CalibrationDetector time", time() - t0)
 
+				ax1.clear()
+				aximshow(ax1, img)
+				calibration_matches.axpaint(ax1)
+
 				if len(calibration_matches) == 4:
 					ax2.clear()
 
@@ -100,24 +103,15 @@ def main():
 
 					t2 = time()
 
-					for cell, row, col, x1, y1, x2, y2 in getCells(img_transformed, tray):
-						sensor_match = sensor_detector.detect(cell, sensor_pattern)
-						color = (1, 0, 0)
-						if sensor_match:
-							ax1.clear()
-							aximshow(ax1, cell)
-							sensor_match.axpaint(ax1)
-							color = (0, 1, 0)
-						rect = Rectangle((x1+2, y1+2), tray.cell_width-4, tray.cell_height-4, alpha=1, fill=False, color=color)
-						ax2.add_patch(rect)
+					# for cell, row, col, x1, y1, x2, y2 in getCells(img_transformed, tray):
+					sensor_matches = sensor_detector.detect(img_transformed, sensor_pattern, tray)
 
 					ui.setTableRow("SensorDetector time", time() - t2)
 
-				aximshow(ax2, img_transformed)
+					sensor_matches.axpaint(ax2)
 
-				# aximshow(ax1, img)
-				# calibration_matches.axpaint(ax1)
-				
+					aximshow(ax2, img_transformed)
+
 			ui.updateFigure()
 
 		else:

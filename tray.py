@@ -23,6 +23,45 @@ class TrayDefinition:
 		self.cell_width_unscaled = entry["cell"]["width"]
 		self.cell_height_unscaled = entry["cell"]["height"]
 
+		self.x0 = (self.width - self.cell_width * self.cols) / 2
+		self.y0 = (self.height - self.cell_height * self.rows) / 2
+
+	def getPos(self, row, col):
+		x1 = int(self.x0 + self.cell_width * col)
+		y1 = int(self.y0 + self.cell_height * row)
+
+		return x1, y1
+
+	def getBounds(self, row, col):
+		x1 = int(self.x0 + self.cell_width * col)
+		y1 = int(self.y0 + self.cell_height * row)
+
+		x2 = int(self.x0 + self.cell_width * (col + 1)) # Not x1 + self.cell_width because lose precision with int
+		y2 = int(self.y0 + self.cell_height * (row + 1))
+
+		return x1, y1, x2, y2
+
+	def getCell(self, img, row, col):
+		x1, y1, x2, y2 = self.getBounds(row, col)
+		cell = img[y1:y2, x1:x2, :]
+		return cell
+
+	def drawGrid(self, ax):
+		x0 = (self.width - self.cell_width * self.cols) / 2
+		y0 = (self.height - self.cell_height * self.rows) / 2
+
+		for row, col in self:
+			x1, y1 = self.getPos(row, col)
+
+			rect = Rectangle((x, y), self.cell_width, self.cell_height, alpha=1, fill=False, color=(1, 0, 1))
+			ax.add_patch(rect)
+
+	def __iter__(self):
+		for row in range(self.rows):
+			for col in range(self.cols):
+				yield row, col
+
+
 def getTrayDef(name, scale=1):
 	trays_file = open("trays.yml")
 	trays_data = safe_load(trays_file)
@@ -33,32 +72,3 @@ def getTrayDef(name, scale=1):
 
 	# trays = {entry["name"]: TrayDefinition(**entry) for entry in trays_data}
 	# return trays[name]
-
-
-def drawGrid(ax, tray):
-	x0 = (tray.width - tray.cell_width * tray.cols) / 2
-	y0 = (tray.height - tray.cell_height * tray.rows) / 2
-
-	for row in range(tray.rows):
-		for col in range(tray.cols):
-			x = int(x0 + tray.cell_width * col)
-			y = int(y0 + tray.cell_height * row)
-
-			rect = Rectangle((x, y), tray.cell_width, tray.cell_height, alpha=1, fill=False, color=(1, 0, 1))
-			ax.add_patch(rect)
-
-def getCells(img, tray):
-	x0 = (tray.width - tray.cell_width * tray.cols) / 2
-	y0 = (tray.height - tray.cell_height * tray.rows) / 2
-
-	for row in range(tray.rows):
-		for col in range(tray.cols):
-			x1 = int(x0 + tray.cell_width * col)
-			y1 = int(y0 + tray.cell_height * row)
-
-			x2 = int(x0 + tray.cell_width * (col + 1))
-			y2 = int(y0 + tray.cell_height * (row + 1))
-
-			cell = img[y1:y2, x1:x2, :]
-
-			yield cell, row, col, x1, y1, x2, y2

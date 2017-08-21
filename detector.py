@@ -29,27 +29,6 @@ class CalibrationDetectorResult:
 		# self.avg_error = self.rss / len(self)
 		# self.product_error = np.product(self.scores)
 
-	def cv2paint(self, img, line_thickness=2):
-		# footer = np.zeros((100, img.shape[1], 3), dtype=np.uint8)
-		# canvas = np.concatenate([img, footer])
-		canvas = np.copy(img)
-
-		pattern_h, pattern_w = self.pattern_shape
-
-		for match, score, center in zip(self.matches, self.scores, self.centers):
-			y, x = match
-			color = color_gradient_bgr(score)
-
-			cv2.rectangle(canvas, 
-				(x, y), (x + pattern_w, y + pattern_h),
-				color=color, thickness=line_thickness)
-
-			cv2.circle(canvas,
-				center, radius=2*line_thickness,
-				color=color, thickness=-1)
-
-		return canvas
-
 	def axpaint(self, ax):
 		pattern_h, pattern_w = self.pattern_shape
 
@@ -81,52 +60,49 @@ class CalibrationDetectorResult:
 
 
 class SensorDetectorResult:
-	def __init__(self, match, score, pattern):
-		self.match = match
-		self.score = score
+	def __init__(self, offsets, scores, matches, pattern, tray):
+		self.offsets = np.flip(offsets, axis=2)
+		self.scores = scores
+		self.matches = matches
+		self.tray = tray
 
 		self.pattern_shape = np.array(pattern.shape[:2])
 
-		center = self.match + self.pattern_shape // 2
-		self.center = np.flip(center, axis=0)
+		centers = offsets + self.pattern_shape // 2
+		self.centers = np.flip(centers, axis=2)
 
-	def cv2paint(self, img, line_thickness=2):
-		# footer = np.zeros((100, img.shape[1], 3), dtype=np.uint8)
-		# canvas = np.concatenate([img, footer])
-		canvas = np.copy(img)
-
+	def axpaint(self, ax, draw_non_matches=False):
 		pattern_h, pattern_w = self.pattern_shape
 
-		y, x = self.match
-		color = color_gradient_bgr(self.score)
+		for row, col in self.tray:
+			if draw_non_matches or self.matches[row, col]:
+				pos = self.tray.getPos(row, col)
+				offset = self.offsets[row, col]
+				score = self.scores[row, col]
+				center = self.centers[row, col]
+				color = color_gradient_rgb(score)
 
-		cv2.rectangle(canvas, 
-			(x, y), (x + pattern_w, y + pattern_h),
-			color=color, thickness=line_thickness)
+				rect = Rectangle(pos + offset, pattern_w, pattern_h, alpha=1, fill=False, color=color)
+				point = Circle(pos + center, radius=2, color=color)
 
-		cv2.circle(canvas,
-			self.center, radius=2*line_thickness,
-			color=color, thickness=-1)
+				ax.add_patch(rect)
+				ax.add_patch(point)
 
-		return canvas
+	# Magic methods to allow it to behave like a sequence
+	def __getitem__(self, key):
+		return self.centers[key]
 
-	def axpaint(self, ax):
-		pattern_h, pattern_w = self.pattern_shape
+	def __iter__(self):
+		return iter(self.centers)
 
-		y, x = self.match
-		color = color_gradient_rgb(self.score)
-
-		rect = Rectangle((x, y), pattern_w, pattern_h, alpha=1, fill=False, color=color)
-		point = Circle(self.center, radius=2, color=color)
-
-		ax.add_patch(rect)
-		ax.add_patch(point)
+	def __len__(self):
+		return len(self.centers)
 
 	def __repr__(self):
-		return repr(self.center)
+		return repr(self.centers)
 
 	def __str__(self):
-		return str(self.center)
+		return str(self.centers)
 
 
 class CalibrationDetector:
@@ -162,7 +138,7 @@ class CalibrationDetector:
 
 	def detect(self, img, pattern):
 		match_map = cv2.matchTemplate(img, pattern, self.match_method)
-		candidates = np.transpose(np.where(match_map >= self.match_threshold))
+		candidates = np.transpose(np.where(match_map > self.match_threshold))
 
 		if 0 in candidates.shape:
 			warnings.warn("0 matches detected")
@@ -192,15 +168,21 @@ class SensorDetector:
 			else:
 				raise AttributeError("Unknown parameter: " + k)
 
-	def detect(self, img, pattern):
-		match_map = cv2.matchTemplate(img, pattern, self.match_method)
+	def detect(self, img, pattern, tray):
+		offsets = np.empty((tray.rows, tray.cols, 2), dtype=np.int_)
+		scores = np.empty((tray.rows, tray.cols), dtype=np.float32)
 
-		best_match_flat = np.argmax(match_map)
-		best_match = np.unravel_index(best_match_flat, match_map.shape)
+		for row, col in tray:
+			cell = tray.getCell(img, row, col)
+			match_map = cv2.matchTemplate(cell, pattern, self.match_method)
 
-		score = match_map[best_match]
+			best_match_flat = np.argmax(match_map)
+			best_match = np.unravel_index(best_match_flat, match_map.shape)
+			offsets[row, col] = best_match
 
-		if score > self.match_threshold:
-			return SensorDetectorResult(best_match, score, pattern)
-		else:
-			return None
+			score = match_map[best_match]
+			scores[row, col] = score
+
+		matches = scores > self.match_threshold
+
+		return SensorDetectorResult(offsets, scores, matches, pattern, tray)
