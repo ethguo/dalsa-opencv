@@ -29,7 +29,7 @@ class CalibrationDetectorResult:
 		# self.avg_error = self.rss / len(self)
 		# self.product_error = np.product(self.scores)
 
-	def paint(self, img, line_thickness=2):
+	def cv2paint(self, img, line_thickness=2):
 		# footer = np.zeros((100, img.shape[1], 3), dtype=np.uint8)
 		# canvas = np.concatenate([img, footer])
 		canvas = np.copy(img)
@@ -53,12 +53,12 @@ class CalibrationDetectorResult:
 	def axpaint(self, ax):
 		pattern_h, pattern_w = self.pattern_shape
 
-		for match, score in zip(self.matches, self.scores):
+		for match, score, center in zip(self.matches, self.scores, self.centers):
 			y, x = match
 			color = color_gradient_rgb(score)
 
 			rect = Rectangle((x, y), pattern_w, pattern_h, alpha=1, fill=False, color=color)
-			point = Circle((x + pattern_w//2, y + pattern_h//2), radius=2, color=color)
+			point = Circle(center, radius=2, color=color)
 
 			ax.add_patch(rect)
 			ax.add_patch(point)
@@ -90,7 +90,7 @@ class SensorDetectorResult:
 		center = self.match + self.pattern_shape // 2
 		self.center = np.flip(center, axis=0)
 
-	def paint(self, img, line_thickness=2):
+	def cv2paint(self, img, line_thickness=2):
 		# footer = np.zeros((100, img.shape[1], 3), dtype=np.uint8)
 		# canvas = np.concatenate([img, footer])
 		canvas = np.copy(img)
@@ -117,7 +117,7 @@ class SensorDetectorResult:
 		color = color_gradient_rgb(self.score)
 
 		rect = Rectangle((x, y), pattern_w, pattern_h, alpha=1, fill=False, color=color)
-		point = Circle((x + pattern_w//2, y + pattern_h//2), radius=2, color=color)
+		point = Circle(self.center, radius=2, color=color)
 
 		ax.add_patch(rect)
 		ax.add_patch(point)
