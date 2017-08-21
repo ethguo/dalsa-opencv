@@ -32,9 +32,7 @@ class TkUI:
 		self.canvas.show()
 
 	def mainloop(self):
-		windows = 0
-		if secondary_window:
-			windows = 1
+		windows = int(secondary_window)
 		self.root.mainloop(windows)
 
 	# TkSliderManager/TkTable wrappers

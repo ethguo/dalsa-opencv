@@ -3,26 +3,23 @@ import numpy as np
 from matplotlib.figure import Figure
 from time import sleep, time
 
-from cvutils import downscale, adaptiveThreshold, aximshow
+from cvutils import loadImage, adaptiveThreshold, axShowImage, axPaint
 from detector import CalibrationDetector, SensorDetector
 from transform import getPerspectiveTransform
 from tray import getTrayDef
 from ui import TkUI
 
-# PATH_IMAGE = "img/other/allsensors.png"
-# PATH_PATTERN = "img/other/allsensors_pattern.png"
-# DOWNSCALE = 1
-# WINDOW_NAME = "tray0"
-
-PATH_IMAGE = "img/calibration/img.png"
-PATH_CALIBRATION_PATTERN = "img/calibration/img_calibration.png"
+PATH_IMAGE = "img/calibration/img1.png"
+PATH_CALIBRATION_PATTERN = "img/calibration/calibration_320.png"
 PATH_SENSOR_PATTERN = "img/calibration/img_pattern.png"
-DOWNSCALE_IMAGE = 4
-DOWNSCALE_CALIBRATION_PATTERN = 1
-DOWNSCALE_SENSOR_PATTERN = 4
-WINDOW_NAME = "calibration"
+SCALE_IMAGE = 1/4
+SCALE_CALIBRATION_PATTERN = 1/4
+SCALE_SENSOR_PATTERN = 1/4
 
 TRAY_NAME = "qvga_7x7"
+TRAY_SCALE = 2
+
+WINDOW_NAME = "calibration"
 
 def preprocess(img, block_radius=5, c=7):
 	img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -30,35 +27,24 @@ def preprocess(img, block_radius=5, c=7):
 	return img
 
 def main():
-	img = cv2.imread(PATH_IMAGE, cv2.IMREAD_COLOR)
-	calibration_pattern = cv2.imread(PATH_CALIBRATION_PATTERN, cv2.IMREAD_COLOR)
-	sensor_pattern = cv2.imread(PATH_SENSOR_PATTERN, cv2.IMREAD_COLOR)
+	img = loadImage(PATH_IMAGE, scale=SCALE_IMAGE)
+	calibration_pattern = loadImage(PATH_CALIBRATION_PATTERN, scale=SCALE_CALIBRATION_PATTERN)
+	sensor_pattern = loadImage(PATH_SENSOR_PATTERN, scale=SCALE_SENSOR_PATTERN)
 
-	img = downscale(img, DOWNSCALE_IMAGE)
-	calibration_pattern = downscale(calibration_pattern, DOWNSCALE_CALIBRATION_PATTERN)
-	sensor_pattern = downscale(sensor_pattern, DOWNSCALE_SENSOR_PATTERN)
-
-	tray = getTrayDef(TRAY_NAME, scale=2)
-
-	# img = img[:,200:]
+	tray = getTrayDef(TRAY_NAME, scale=TRAY_SCALE)
 
 	calibration_detector = CalibrationDetector(match_threshold=0.6, clustering_bandwidth=40) # Used to detect calibration points
 	sensor_detector = SensorDetector(match_threshold=0.8)
 
 	f = Figure()
-	# f.set_tight_layout(True)
 
 	ui = TkUI(f, WINDOW_NAME)
-	ui.addSlider("calib_match_threshold",  0.60,   0,   1, 0.01)
+	ui.addSlider("calib_match_threshold",  0.50,   0,   1, 0.01)
 	ui.addSlider("clustering_bandwidth",     40,   1, 100)
 	ui.addSlider("block_radius",             50,   1, 200)
 	ui.addSlider("c",                        20, -50,  50)
-	ui.addSlider("sensor_match_threshold", 0.50,   0,   1, 0.01)
+	ui.addSlider("sensor_match_threshold", 0.25,   0,   1, 0.01)
 
-	# ax1 = f.add_subplot(2, 2, 1)
-	# ax2 = f.add_subplot(2, 2, 2)
-	# ax3 = f.add_subplot(2, 2, 3)
-	# ax4 = f.add_subplot(2, 2, 4)
 	ax1 = f.add_subplot(121)
 	ax2 = f.add_subplot(122)
 
@@ -68,49 +54,40 @@ def main():
 		calibration_detector.clustering_bandwidth, changed2 = ui.getSlider("clustering_bandwidth")
 		block_radius, changed3 = ui.getSlider("block_radius")
 		c, changed4 = ui.getSlider("c")
-
 		sensor_detector.match_threshold, changed5 = ui.getSlider("sensor_match_threshold")
 
 		if any((changed1, changed2, changed3, changed4, changed5)):
 			img_proc = preprocess(img, block_radius, c)
 			calibration_pattern_proc = preprocess(calibration_pattern, block_radius, c)
 
-			# aximshow(ax3, img_proc)
-			# aximshow(ax4, pattern_proc)
-
 			# Stopwatch execution of calibration_detector.detect
 			t0 = time()
-
+			
 			calibration_matches = calibration_detector.detect(img_proc, calibration_pattern_proc)
+			
+			ui.setTableRow("CalibrationDetector time", time() - t0)
 
-			if calibration_matches:
-				ui.setTableRow("CalibrationDetector time", time() - t0)
+			axShowImage(ax1, img)
+			axPaint(ax1, calibration_matches)
 
-				ax1.clear()
-				aximshow(ax1, img)
-				calibration_matches.axpaint(ax1)
+			if len(calibration_matches) >= 4:
+				t1 = time()
 
-				if len(calibration_matches) == 4:
-					ax2.clear()
+				transform = getPerspectiveTransform(img, calibration_matches[:4], (tray.height, tray.width))
 
-					t1 = time()
+				img_transformed = transform(img)
 
-					transform = getPerspectiveTransform(img, calibration_matches, (tray.height, tray.width))
+				ui.setTableRow("Transform time", time() - t1)
 
-					img_transformed = transform(img)
+				t2 = time()
 
-					ui.setTableRow("Transform time", time() - t1)
+				# for cell, row, col, x1, y1, x2, y2 in getCells(img_transformed, tray):
+				sensor_matches = sensor_detector.detect(img_transformed, sensor_pattern, tray)
 
-					t2 = time()
+				ui.setTableRow("SensorDetector time", time() - t2)
 
-					# for cell, row, col, x1, y1, x2, y2 in getCells(img_transformed, tray):
-					sensor_matches = sensor_detector.detect(img_transformed, sensor_pattern, tray)
-
-					ui.setTableRow("SensorDetector time", time() - t2)
-
-					sensor_matches.axpaint(ax2)
-
-					aximshow(ax2, img_transformed)
+				axShowImage(ax2, img_transformed)
+				axPaint(ax2, sensor_matches)
 
 			ui.updateFigure()
 

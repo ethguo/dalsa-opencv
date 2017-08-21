@@ -1,17 +1,42 @@
 import cv2
 import numpy as np
+from warnings import warn
 
-def aximshow(ax, img, cmap="gray"):
+def loadImage(path, scale=1):
+	img = cv2.imread(path, cv2.IMREAD_COLOR)
+	if img is None:
+		raise FileNotFoundError("No such file: " + path)
+	img = scaleImage(img, scale)
+	return img
+
+def scaleImage(img, scale):
+	if scale < 1:
+		interpolation = cv2.INTER_AREA
+	else:
+		interpolation = cv2.INTER_CUBIC
+
+	new_size = (int(img.shape[1]*scale), int(img.shape[0]*scale))
+	output = cv2.resize(img, new_size, interpolation=interpolation)
+	return output
+
+def axShowImage(ax, img, cmap="gray"):
+	ax.clear()
 	if img.ndim == 3 and img.shape[2] == 3:
 		img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 		ax.imshow(img)
 	else:
 		ax.imshow(img, cmap=cmap)
 
+def axPaint(ax, matches):
+	if matches:
+		matches.axPaint(ax)
+	else:
+		warn("Cannot axPaint: No matches")
+
 def getHsv(img):
 	img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-	img_hsv_channels = cv2.split(img_hsv)
-	return img_hsv_channels
+	channels = cv2.split(img_hsv)
+	return channels
 
 def getHue(img):
 	return getHsv(img)[0]
@@ -21,11 +46,6 @@ def getSat(img):
 
 def getVal(img):
 	return getHsv(img)[2]
-
-def downscale(img, downscale_factor):
-	img_dsize = (img.shape[1]//downscale_factor, img.shape[0]//downscale_factor)
-	output = cv2.resize(img, img_dsize, interpolation=cv2.INTER_AREA)
-	return output
 
 def blur(img, kernel_size=5):
 	return cv2.GaussianBlur(img, (kernel_size, kernel_size))
@@ -38,9 +58,8 @@ def canny(img, threshold_low, threshold_ratio=3, gaussian_kernel_size=5, sobel_k
 def adaptiveThreshold(img, block_radius=5, c=7):
 	return cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, block_radius*2+1, c)
 
-
 def fourCorners(*args):
-	"""Returns an `np.ndarray` of the four corners of an axis-aligned box.
+	"""Returns an `numpy.ndarray` of the four corners of an axis-aligned box.
 	
 	Args:
 	    *args: One or two iterables of length 2:

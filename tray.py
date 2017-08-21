@@ -10,18 +10,13 @@ class TrayDefinition:
 		self.scale = scale
 
 		self.name = entry["name"]
-		self.cols = entry["tray"]["cols"]
 		self.rows = entry["tray"]["rows"]
+		self.cols = entry["tray"]["cols"]
 
 		self.width = entry["tray"]["width"] * scale
 		self.height = entry["tray"]["height"] * scale
 		self.cell_width = entry["cell"]["width"] * scale
 		self.cell_height = entry["cell"]["height"] * scale
-
-		self.width_unscaled = entry["tray"]["width"]
-		self.height_unscaled = entry["tray"]["height"]
-		self.cell_width_unscaled = entry["cell"]["width"]
-		self.cell_height_unscaled = entry["cell"]["height"]
 
 		self.x0 = (self.width - self.cell_width * self.cols) / 2
 		self.y0 = (self.height - self.cell_height * self.rows) / 2
@@ -69,6 +64,3 @@ def getTrayDef(name, scale=1):
 	for entry in trays_data:
 		if entry["name"] == name:
 			return TrayDefinition(entry, scale)
-
-	# trays = {entry["name"]: TrayDefinition(**entry) for entry in trays_data}
-	# return trays[name]
