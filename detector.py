@@ -5,8 +5,8 @@ In detector_result.py, indices are (x, y). This is to follow numpy convention.
 
 import cv2
 import numpy as np
+import logging
 from sklearn.cluster import MeanShift, estimate_bandwidth
-from warnings import warn
 
 from detector_result import CalibrationDetectorResult, SensorDetectorResult
 
@@ -46,8 +46,8 @@ class CalibrationDetector:
 		candidates = np.transpose(np.where(match_map > self.match_threshold))
 
 		if 0 in candidates.shape:
-			warn("0 matches detected")
-			return None
+			logging.warning("0 matches detected")
+			return
 
 		self.clusterer.set_params(bandwidth=self.clustering_bandwidth)
 		self.clusterer.fit(candidates)

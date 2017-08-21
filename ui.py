@@ -69,10 +69,10 @@ class TkSliderManager:
 			else:
 				raise ValueError("var_type " + str(var_type) + " not supported.")
 		else:
-			if type(initial_value) == float \
-					or type(from_) == float \
-					or type(to) == float \
-					or type(resolution) == float:
+			if type(initial_value) is float \
+					or type(from_) is float \
+					or type(to) is float \
+					or type(resolution) is float:
 				tk_variable = tk.DoubleVar()
 			else:
 				tk_variable = tk.IntVar()
@@ -141,7 +141,7 @@ class TkTable:
 
 
 	def set(self, name, value):
-		if type(value) == np.ndarray:
+		if isinstance(value, np.ndarray):
 			self._insertArray(name, value)
 
 		else:
@@ -152,7 +152,7 @@ class TkTable:
 				self.tree.set(name, "Value", value)
 				if self.show_delta:
 					delta = value - self.last_values[name]
-					text = "%+d"%delta if type(delta) == int else "%+f"%delta
+					text = "%+d"%delta if type(delta) is int else "%+f"%delta
 					self.tree.set(name, "Delta", text)
 
 		self.last_values[name] = value

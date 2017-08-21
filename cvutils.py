@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from warnings import warn
+import logging
 
 def loadImage(path, scale=1):
 	img = cv2.imread(path, cv2.IMREAD_COLOR)
@@ -31,7 +31,7 @@ def axPaint(ax, matches):
 	if matches:
 		matches.axPaint(ax)
 	else:
-		warn("Cannot axPaint: No matches")
+		logging.warning("Cannot axPaint: No matches")
 
 def getHsv(img):
 	img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -55,8 +55,13 @@ def canny(img, threshold_low, threshold_ratio=3, gaussian_kernel_size=5, sobel_k
 	img = cv2.Canny(img, threshold_low, threshold_low*threshold_ratio, sobel_kernel_size)
 	return img
 
+def colorToGrayscale(img):
+	return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
 def adaptiveThreshold(img, block_radius=5, c=7):
-	return cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, block_radius*2+1, c)
+	img = colorToGrayscale(img)
+	img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, block_radius*2+1, c)
+	return img
 
 def fourCorners(*args):
 	"""Returns an `numpy.ndarray` of the four corners of an axis-aligned box.
