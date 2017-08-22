@@ -3,10 +3,11 @@ from matplotlib.figure import Figure
 from time import sleep, time
 
 from config import loadYAML
-from cvutils import loadImage, adaptiveThreshold, findBestMatches
+from cvutils import adaptiveThreshold
 from detector import CalibrationDetector, SensorDetector
 from transform import getPerspectiveTransform
 from tray import getTrayDef
+from utils import loadImage, axShowImage, axPaint, findBestMatches
 
 def calibrate(img, params, tray):
 	pattern = loadImage(**params.calibration_detector.pattern)
