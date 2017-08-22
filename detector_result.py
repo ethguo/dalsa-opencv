@@ -80,15 +80,15 @@ class SensorDetectorResult (DetectorResult):
 	    scores (numpy.ndarray): The quality of match ([0..1]).
 	"""
 	def __init__(self, offsets, scores, pattern, tray):
-		self._offsets = np.flip(_offsets, axis=2)
+		self._offsets = np.flip(offsets, axis=2)
 		self.scores = scores
 		self.matches = scores > 0
 		self._tray = tray
 
 		self._pattern_shape = np.array(pattern.shape[:2])
 
-		centers = _offsets + self._pattern_shape // 2
-		centers = np.where(_offsets != -1, centers, -1)
+		centers = offsets + self._pattern_shape // 2
+		centers = np.where(offsets != -1, centers, -1)
 		self.centers = np.flip(centers, axis=2)
 
 	def axPaint(self, ax):
