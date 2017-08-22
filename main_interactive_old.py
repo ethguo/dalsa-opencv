@@ -7,12 +7,12 @@ from cvutils import adaptiveThreshold
 from detector import CalibrationDetector, SensorDetector
 from transform import getPerspectiveTransform
 from tray import getTrayDef
-from ui import TkUI
-from utils import loadImage, axShowImage, axPaint
+from ui import TkUI, axShowImage, axPaint
+from utils import loadImage
 
 PATH_IMAGE = "img/calibration/img1.png"
 PATH_CALIBRATION_PATTERN = "img/calibration/calibration_320.png"
-PATH_SENSOR_PATTERN = "img/calibration/img_pattern.png"
+PATH_SENSOR_PATTERN = "img/calibration/pattern2.png"
 SCALE_IMAGE = 1/4
 SCALE_CALIBRATION_PATTERN = 1/4
 SCALE_SENSOR_PATTERN = 1/4
@@ -21,11 +21,6 @@ TRAY_NAME = "qvga_7x7"
 TRAY_SCALE = 2
 
 WINDOW_NAME = "calibration"
-
-def preprocess(img, block_radius=5, c=7):
-	img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-	img = adaptiveThreshold(img, block_radius, c)
-	return img
 
 def main():
 	img = loadImage(PATH_IMAGE, scale=SCALE_IMAGE)
@@ -58,8 +53,8 @@ def main():
 		sensor_detector.match_threshold, changed5 = ui.getSlider("sensor_match_threshold")
 
 		if any((changed1, changed2, changed3, changed4, changed5)):
-			img_proc = preprocess(img, block_radius, c)
-			calibration_pattern_proc = preprocess(calibration_pattern, block_radius, c)
+			img_proc = adaptiveThreshold(img, block_radius, c)
+			calibration_pattern_proc = adaptiveThreshold(calibration_pattern, block_radius, c)
 
 			# Stopwatch execution of calibration_detector.detect
 			t0 = time()

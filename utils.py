@@ -20,8 +20,8 @@ def calibrate(img, params, tray):
 	pattern = adaptiveThreshold(pattern, **params.calibration_detector.preprocessing)
 
 	# Detect calibration points
-	detector = CalibrationDetector(pattern, **params.calibration_detector.detector)
-	result = detector.detect(detector_img)
+	detector = CalibrationDetector(**params.calibration_detector.detector)
+	result = detector.detect(detector_img, pattern)
 
 	if len(result) < 4:
 		logging.error("Only found %d out of 4 required calibration points." %(len(result)))
@@ -35,9 +35,9 @@ def detectSensors(img, params, tray):
 	results = []
 	for detector_params in params.sensor_detectors:
 		pattern = loadImage(**detector_params.pattern)
-		detector = SensorDetector(pattern, tray, **detector_params.detector)
+		detector = SensorDetector(**detector_params.detector)
 
-		result = detector.detect(img)
+		result = detector.detect(img, pattern, tray)
 		results.append(result)
 
 	best_matches = findBestMatches(results)
