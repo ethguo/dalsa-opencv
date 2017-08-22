@@ -1,3 +1,4 @@
+"""This module includes classes which construct and manage UIs, as well as convenience functions for drawing on matplotlib `Axes`."""
 import cv2
 import numpy as np
 import tkinter as tk
@@ -8,6 +9,13 @@ matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 def axShowImage(ax, img, cmap="gray"):
+	"""Wrapper around matplotlib's `ax.imshow`, automatically detects whether the image is color or grayscale and behaves accordingly.
+	
+	Args:
+	    ax (matplotlib.axes.Axes): `Axes` to draw image on.
+	    img (numpy.ndarray): Color or grayscale image.
+	    cmap (str, optional): If image is grayscale, the matplotlib colormap to use.
+	"""
 	ax.clear()
 	if img.ndim == 3 and img.shape[2] == 3:
 		img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -16,13 +24,36 @@ def axShowImage(ax, img, cmap="gray"):
 		ax.imshow(img, cmap=cmap)
 
 def axPaint(ax, matches):
+	"""Wrapper around `matches.axPaint`, 
+	
+	Args:
+	    ax (matplotlib.axes.Axes): `Axes` passed to `matches.axPaint`
+	    matches (detector_result.DetectorResult): `DetectorResult` object to paint. Will warn if None.
+	"""
 	if matches:
 		matches.axPaint(ax)
 	else:
 		logging.warning("Cannot axPaint: No matches")
 
 class TkUI:
+	"""Summary
+	
+	Attributes:
+	    canvas (TYPE): Description
+	    root (TYPE): Description
+	    secondary_window (TYPE): Description
+	    sliders (TYPE): Description
+	    table (TYPE): Description
+	"""
 	def __init__(self, figure, label="TkUI", secondary_window=True, table_show_delta=True):
+		"""Summary
+		
+		Args:
+		    figure (TYPE): Description
+		    label (str, optional): Description
+		    secondary_window (bool, optional): Description
+		    table_show_delta (bool, optional): Description
+		"""
 		self.root = tk.Tk()
 		self.root.wm_title(label)
 		self.canvas = None
@@ -41,30 +72,77 @@ class TkUI:
 
 	# Tkinter/TkAgg wrappers
 	def update(self):
+		"""Summary
+		"""
 		self.root.update()
 
 	def updateFigure(self):
+		"""Summary
+		"""
 		self.canvas.show()
 
 	def mainloop(self):
+		"""Summary
+		"""
 		self.root.mainloop()
 
 	# TkSliderManager/TkTable wrappers
 	def addSlider(self, *args, **kwargs):
+		"""Summary
+		
+		Args:
+		    *args: Description
+		    **kwargs: Description
+		"""
 		self.sliders.add(*args, **kwargs)
 
 	def getSlider(self, name):
+		"""Summary
+		
+		Args:
+		    name (TYPE): Description
+		
+		Returns:
+		    TYPE: Description
+		"""
 		return self.sliders.get(name)
 
 	def setSlider(self, name, value):
+		"""Summary
+		
+		Args:
+		    name (TYPE): Description
+		    value (TYPE): Description
+		"""
 		self.sliders.set(name, value)
 
 	def setTableRow(self, name, value):
+		"""Summary
+		
+		Args:
+		    name (TYPE): Description
+		    value (TYPE): Description
+		"""
 		self.table.set(name, value)
 
 
 class TkSliderManager:
+
+	"""Summary
+	
+	Attributes:
+	    container (TYPE): Description
+	    last_values (dict): Description
+	    master (TYPE): Description
+	    tk_variables (dict): Description
+	"""
+	
 	def __init__(self, master):
+		"""Summary
+		
+		Args:
+		    master (TYPE): Description
+		"""
 		self.master = master
 		self.tk_variables = {}
 		self.last_values = {}
@@ -75,6 +153,20 @@ class TkSliderManager:
 
 	# var_type is int or float
 	def add(self, name, initial_value=0, from_=0, to=100, resolution=1, var_type=None, **kwargs):
+		"""Summary
+		
+		Args:
+		    name (TYPE): Description
+		    initial_value (int, optional): Description
+		    from_ (int, optional): Description
+		    to (int, optional): Description
+		    resolution (int, optional): Description
+		    var_type (None, optional): Description
+		    **kwargs: Description
+		
+		Raises:
+		    ValueError: Description
+		"""
 		if var_type:
 			if var_type in (int, "int"):
 				tk_variable = tk.IntVar()
@@ -108,7 +200,14 @@ class TkSliderManager:
 		self.last_values[name] = None
 
 	def get(self, name):
-		"""Returns value, and whether or not it was changed since last get."""
+		"""Returns value, and whether or not it was changed since last get.
+		
+		Args:
+		    name (TYPE): Description
+		
+		Returns:
+		    TYPE: Description
+		"""
 		value = self.tk_variables[name].get()
 		if value != self.last_values[name]:
 			self.last_values[name] = value
@@ -116,12 +215,36 @@ class TkSliderManager:
 		return value, False
 
 	def set(self, name, value):
+		"""Summary
+		
+		Args:
+		    name (TYPE): Description
+		    value (TYPE): Description
+		"""
 		self.tk_variables[name].set(value)
 		self.last_values[name] = None
 
 
 class TkTable:
+
+	"""Summary
+	
+	Attributes:
+	    container (TYPE): Description
+	    last_values (dict): Description
+	    master (TYPE): Description
+	    names (TYPE): Description
+	    show_delta (TYPE): Description
+	    tree (TYPE): Description
+	"""
+	
 	def __init__(self, master, show_delta=True):
+		"""Summary
+		
+		Args:
+		    master (TYPE): Description
+		    show_delta (bool, optional): Description
+		"""
 		self.master = master
 		self.show_delta = show_delta
 		self.names = set()
@@ -155,6 +278,12 @@ class TkTable:
 
 
 	def set(self, name, value):
+		"""Summary
+		
+		Args:
+		    name (TYPE): Description
+		    value (TYPE): Description
+		"""
 		if isinstance(value, np.ndarray):
 			self._insertArray(name, value)
 
@@ -172,6 +301,15 @@ class TkTable:
 		self.last_values[name] = value
 
 	def _insertArray(self, name, array):
+		"""Summary
+		
+		Args:
+		    name (TYPE): Description
+		    array (TYPE): Description
+		
+		Returns:
+		    TYPE: Description
+		"""
 		value0 = "ndarray(%s, %s)" % (array.shape, array.dtype)
 
 		if name not in self.names:
