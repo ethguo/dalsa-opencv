@@ -6,6 +6,20 @@ import matplotlib
 matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
+def axShowImage(ax, img, cmap="gray"):
+	ax.clear()
+	if img.ndim == 3 and img.shape[2] == 3:
+		img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+		ax.imshow(img)
+	else:
+		ax.imshow(img, cmap=cmap)
+
+def axPaint(ax, matches):
+	if matches:
+		matches.axPaint(ax)
+	else:
+		logging.warning("Cannot axPaint: No matches")
+
 class TkUI:
 	def __init__(self, figure, label="TkUI", secondary_window=True, table_show_delta=True):
 		self.root = tk.Tk()

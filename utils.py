@@ -11,19 +11,36 @@ def loadImage(path, scale=1):
 	img = scaleImage(img, scale)
 	return img
 
-def axShowImage(ax, img, cmap="gray"):
-	ax.clear()
-	if img.ndim == 3 and img.shape[2] == 3:
-		img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-		ax.imshow(img)
-	else:
-		ax.imshow(img, cmap=cmap)
+def calibrate(img, params, tray):
+	pattern = loadImage(**params.calibration_detector.pattern)
 
-def axPaint(ax, matches):
-	if matches:
-		matches.axPaint(ax)
-	else:
-		logging.warning("Cannot axPaint: No matches")
+	detector_img = adaptiveThreshold(img, **params.calibration_detector.preprocessing)
+	pattern = adaptiveThreshold(pattern, **params.calibration_detector.preprocessing)
+
+	# Detect calibration points
+	detector = CalibrationDetector(pattern, **params.calibration_detector.detector)
+	result = detector.detect(detector_img)
+
+	if len(result) < 4:
+		logging.error("Only found %d out of 4 required calibration points." %(len(result)))
+		return
+
+	transform = getPerspectiveTransform(img, result[:4], (tray.height, tray.width))
+	img_transformed = transform(img)
+	return img_transformed
+
+def detectSensors(img, params, tray):
+	results = []
+	for detector_params in params.sensor_detectors:
+		pattern = loadImage(**detector_params.pattern)
+		detector = SensorDetector(pattern, tray, **detector_params.detector)
+
+		result = detector.detect(img)
+		results.append(result)
+
+	best_matches = findBestMatches(results)
+
+	return best_matches
 
 def findBestMatches(results):
 	all_scores = np.stack([result.scores for result in results])
