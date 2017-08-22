@@ -1,3 +1,4 @@
+import cv2
 import numpy as np
 import tkinter as tk
 import tkinter.ttk as ttk
@@ -46,8 +47,7 @@ class TkUI:
 		self.canvas.show()
 
 	def mainloop(self):
-		windows = int(secondary_window)
-		self.root.mainloop(windows)
+		self.root.mainloop()
 
 	# TkSliderManager/TkTable wrappers
 	def addSlider(self, *args, **kwargs):

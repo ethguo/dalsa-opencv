@@ -1,3 +1,5 @@
+import numpy as np
+
 from matplotlib.patches import Circle, Rectangle
 from detector import CalibrationDetector
 from config import loadYAML
@@ -39,14 +41,23 @@ class TrayDefinition:
 		cell = img[y1:y2, x1:x2, :]
 		return cell
 
-	def drawGrid(self, ax):
+	def drawGrid(self, ax, labels=None):
 		x0 = (self.width - self.cell_width * self.cols) / 2
 		y0 = (self.height - self.cell_height * self.rows) / 2
 
+		colors = {}
+		if labels is not None:
+			for index, label in enumerate(np.unique(labels)):
+				colors[label] = "C" + str(index)
+
 		for row, col in self:
 			x1, y1 = self.getPos(row, col)
-
-			rect = Rectangle((x, y), self.cell_width, self.cell_height, alpha=1, fill=False, color=(1, 0, 1))
+			if labels is not None:
+				label = labels[row, col]
+				color = colors[label]
+			else:
+				color = "b"
+			rect = Rectangle((x1+1, y1+1), self.cell_width-2, self.cell_height-2, alpha=1, fill=False, color=color)
 			ax.add_patch(rect)
 
 	def __iter__(self):
