@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from sklearn.cluster import MeanShift, estimate_bandwidth
+import warnings
 
 from preprocess import *
 from hsv import *
@@ -8,17 +9,19 @@ from hsv import *
 color_gradient = lambda val: (0, val*2*255, 255) if val < 0.5 else (0, 255, (1-val)*2*255) #BGR
 
 class SensorDetectorResult:
-	def __init__(self, detector, matches, match_map):
+	def __init__(self, detector, matches, match_map, pattern):
 		self.matches = matches
 		self.match_map = match_map
+
+		self.pattern_shape = np.array(pattern.shape[:2])
+
+		self.centers = self.matches + (self.pattern_shape // 2)
 
 		self.scores = match_map[tuple(np.transpose(matches))]
 		self.squared_errors = (1 - self.scores) ** 2
 		self.rss = np.sum(self.squared_errors)
 		self.avg_error = self.rss / len(self)
 		self.product_error = np.product(self.scores)
-
-		self.pattern_shape = detector.pattern.shape[:2]
 
 	def paint(self, img, line_thickness=1):
 		# footer = np.zeros((100, img.shape[1], 3), dtype=np.uint8)
@@ -53,10 +56,8 @@ class SensorDetectorResult:
 
 
 class SensorDetector:
-	def __init__(self, pattern, params={}, **kwargs):
+	def __init__(self, params={}, **kwargs):
 		# Available parameters
-		self.preprocess = lambda img: img
-		self.pattern = pattern
 		self.match_method = cv2.TM_CCOEFF_NORMED
 		self.match_threshold = 0.8
 		self.clustering_bandwidth = 40
@@ -70,19 +71,7 @@ class SensorDetector:
 			else:
 				raise AttributeError("Unknown parameter: " + k)
 
-		# Preprocess pattern
-		self.pattern_proc = self.preprocess(self.pattern)
-
 		self.clusterer = MeanShift(self.clustering_bandwidth)
-
-	# def preprocess(self, img):
-	# 	output = img #skip
-
-	# 	# output = canny(img, 32)
-	# 	# output = sat_mask(img, self.threshold_block_radius, self.threshold_c)
-	# 	# output = get_sat(img)
-
-	# 	return output
 
 	def _best_matches(self, match_map, candidates, labels):
 		num_matches = len(np.unique(labels))
@@ -97,13 +86,12 @@ class SensorDetector:
 
 		return best_matches
 
-	def detect(self, img):
-		img_proc = self.preprocess(img)
-		match_map = cv2.matchTemplate(img_proc, self.pattern_proc, self.match_method)
+	def detect(self, img, pattern):
+		match_map = cv2.matchTemplate(img, pattern, self.match_method)
 		candidates = np.transpose(np.where(match_map >= self.match_threshold))
 
 		if 0 in candidates.shape:
-			raise Warning("0 matches detected")
+			warnings.warn("0 matches detected")
 			return None
 
 		self.clusterer.set_params(bandwidth=self.clustering_bandwidth)
@@ -115,7 +103,4 @@ class SensorDetector:
 
 		# matches = np.int_(centers)
 
-		# cv2.imshow("pattern_proc", pattern_proc)
-		# cv2.imshow("img_proc", img_proc)
-
-		return SensorDetectorResult(self, matches, match_map), img_proc
+		return SensorDetectorResult(self, matches, match_map, pattern)
