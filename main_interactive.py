@@ -1,3 +1,4 @@
+"""Please note that this file is 'deprecated', in that it still works but the code isn't in line with main.py and main_gui.py."""
 import cv2
 import numpy as np
 from matplotlib.figure import Figure
