@@ -1,0 +1,33 @@
+image:
+  path: img/calibration/img1.png
+  scale: 0.25
+
+tray:
+  name: qvga_7x7
+  scale: 2
+
+calibration_detector:
+  preprocessing:
+    block_radius: 50
+    c: 20
+  pattern:
+    path: img/calibration/calibration_320.png
+    scale: 0.25
+  detector:
+    match_threshold: 0.5
+    clustering_bandwidth: 40
+
+sensor_detectors:
+- name: sensor_without_lid
+  pattern:
+    path: img/calibration/pattern1.png
+    scale: 0.25
+  detector:
+    match_threshold: 0.4
+- name: sensor_with_lid
+  pattern:
+    path: img/calibration/pattern2.png
+    scale: 0.25
+  detector:
+    match_threshold: 0.5
+

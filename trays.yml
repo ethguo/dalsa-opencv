@@ -1,0 +1,10 @@
+# All measurements in mm
+- name: qvga_7x7
+  tray:
+    width: 330
+    height: 200
+    rows: 7
+    cols: 7
+  cell:
+    width: 32.3
+    height: 26.5
