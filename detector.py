@@ -11,8 +11,9 @@ from sklearn.cluster import MeanShift, estimate_bandwidth
 from detector_result import CalibrationDetectorResult, SensorDetectorResult
 
 class CalibrationDetector:
-	def __init__(self, params={}, **kwargs):
-		# Available parameters
+	def __init__(self, pattern, params={}, **kwargs):
+		self.pattern = pattern
+		# Available parameters:
 		self.match_method = cv2.TM_CCOEFF_NORMED
 		self.match_threshold = 0.8
 		self.clustering_bandwidth = 40
@@ -41,8 +42,8 @@ class CalibrationDetector:
 
 		return best_matches
 
-	def detect(self, img, pattern):
-		match_map = cv2.matchTemplate(img, pattern, self.match_method)
+	def detect(self, img):
+		match_map = cv2.matchTemplate(img, self.pattern, self.match_method)
 		candidates = np.transpose(np.where(match_map > self.match_threshold))
 
 		if 0 in candidates.shape:
@@ -55,12 +56,14 @@ class CalibrationDetector:
 
 		matches = self._bestMatches(match_map, candidates, labels)
 
-		return CalibrationDetectorResult(matches, match_map, pattern)
+		return CalibrationDetectorResult(matches, match_map, self.pattern)
 
 
 class SensorDetector:
-	def __init__(self, params={}, **kwargs):
-		# Available parameters
+	def __init__(self, pattern, tray, params={}, **kwargs):
+		self.pattern = pattern
+		self.tray = tray
+		# Available parameters:
 		self.match_method = cv2.TM_CCOEFF_NORMED
 		self.match_threshold = 0.8
 
@@ -73,21 +76,21 @@ class SensorDetector:
 			else:
 				raise AttributeError("Unknown parameter: " + k)
 
-	def detect(self, img, pattern, tray):
-		offsets = np.empty((tray.rows, tray.cols, 2), dtype=np.int_)
-		scores = np.empty((tray.rows, tray.cols), dtype=np.float32)
+	def detect(self, img):
+		offsets = np.full((self.tray.rows, self.tray.cols, 2), -1, dtype=np.int_)
+		scores = np.zeros((self.tray.rows, self.tray.cols), dtype=np.float32)
 
-		for row, col in tray:
-			cell = tray.getCell(img, row, col)
-			match_map = cv2.matchTemplate(cell, pattern, self.match_method)
+		for row, col in self.tray:
+			cell = self.tray.getCell(img, row, col)
+			match_map = cv2.matchTemplate(cell, self.pattern, self.match_method)
 
 			best_match_flat = np.argmax(match_map)
 			best_match = np.unravel_index(best_match_flat, match_map.shape)
-			offsets[row, col] = best_match
 
 			score = match_map[best_match]
-			scores[row, col] = score
+			if score > self.match_threshold:
+				offsets[row, col] = best_match
 
-		matches = scores > self.match_threshold
+				scores[row, col] = score
 
-		return SensorDetectorResult(offsets, scores, matches, pattern, tray)
+		return SensorDetectorResult(offsets, scores, self.pattern, self.tray)

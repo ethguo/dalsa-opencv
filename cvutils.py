@@ -86,3 +86,10 @@ def fourCorners(*args):
 		(b[0], b[1]),
 		(b[0], a[1])
 		), dtype=np.float32)
+
+def findBestMatches(results):
+	all_scores = np.stack([result.scores for result in results])
+	best_scores = np.amax(all_scores, axis=0)
+	best_matches = np.argmax(all_scores, axis=0)
+	best_matches = np.where(best_scores != 0, best_matches, -1)
+	return best_matches

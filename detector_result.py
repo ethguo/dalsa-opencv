@@ -52,22 +52,23 @@ class CalibrationDetectorResult (DetectorResult):
 
 
 class SensorDetectorResult (DetectorResult):
-	def __init__(self, offsets, scores, matches, pattern, tray):
+	def __init__(self, offsets, scores, pattern, tray):
 		self.offsets = np.flip(offsets, axis=2)
 		self.scores = scores
-		self.matches = matches
+		self.matches = scores > 0
 		self.tray = tray
 
 		self.pattern_shape = np.array(pattern.shape[:2])
 
 		centers = offsets + self.pattern_shape // 2
+		centers = np.where(offsets != -1, centers, -1)
 		self.centers = np.flip(centers, axis=2)
 
-	def axPaint(self, ax, draw_non_matches=False):
+	def axPaint(self, ax):
 		pattern_h, pattern_w = self.pattern_shape
 
 		for row, col in self.tray:
-			if draw_non_matches or self.matches[row, col]:
+			if self.matches[row, col]:
 				pos = self.tray.getPos(row, col)
 				offset = self.offsets[row, col]
 				score = self.scores[row, col]

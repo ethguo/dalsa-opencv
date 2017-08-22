@@ -3,41 +3,53 @@ from matplotlib.figure import Figure
 from time import sleep, time
 
 from config import loadYAML
-from cvutils import loadImage, adaptiveThreshold, axShowImage, axPaint
+from cvutils import loadImage, adaptiveThreshold, findBestMatches
 from detector import CalibrationDetector, SensorDetector
 from transform import getPerspectiveTransform
 from tray import getTrayDef
 
+def calibrate(img, params, tray):
+	pattern = loadImage(**params.calibration_detector.pattern)
+
+	detector_img = adaptiveThreshold(img, **params.calibration_detector.preprocessing)
+	pattern = adaptiveThreshold(pattern, **params.calibration_detector.preprocessing)
+
+	# Detect calibration points
+	detector = CalibrationDetector(pattern, **params.calibration_detector.detector)
+	result = detector.detect(detector_img)
+
+	if len(result) < 4:
+		logging.error("Only found %d out of 4 required calibration points." %(len(result)))
+		return
+
+	transform = getPerspectiveTransform(img, result[:4], (tray.height, tray.width))
+	img_transformed = transform(img)
+	return img_transformed
+
+def detectSensors(img, params, tray):
+	results = []
+	for detector_params in params.sensor_detectors:
+		pattern = loadImage(**detector_params.pattern)
+		detector = SensorDetector(pattern, tray, **detector_params.detector)
+
+		result = detector.detect(img)
+		results.append(result)
+
+	best_matches = findBestMatches(results)
+
+	return best_matches
+
 def main():
+	logging.basicConfig(level=logging.DEBUG)
+
 	params = loadYAML("parameters.yml")
-
-	img = loadImage(**params.image)
-	calibration_pattern = loadImage(**params.calibration_pattern)
-	sensor_pattern = loadImage(**params.sensor_pattern)
-
 	tray = getTrayDef(**params.tray)
 
-	calibration_detector = CalibrationDetector(**params.calibration.detector) # Used to detect calibration points
-	sensor_detector = SensorDetector(**params.sensors.detector)
+	img = loadImage(**params.image)
+	img = calibrate(img, params, tray)
+	results = detectSensors(img, params, tray)
 
-	calibration_img = adaptiveThreshold(img, **params.calibration.preprocessing)
-	calibration_pattern = adaptiveThreshold(calibration_pattern, **params.calibration.preprocessing)
-	
-	calibration_matches = calibration_detector.detect(calibration_img, calibration_pattern)
-	
-	if len(calibration_matches) < 4:
-		logging.error("Only found %d out of 4 required calibration points." %(len(calibration_matches)))
-
-	else:
-		transform = getPerspectiveTransform(img, calibration_matches[:4], (tray.height, tray.width))
-
-		img_transformed = transform(img)
-
-		sensor_matches = sensor_detector.detect(img_transformed, sensor_pattern, tray)
-
-		logging.info(str(sensor_matches.centers))
-		return sensor_matches.centers
-
+	print(results)
 
 if __name__ == "__main__":
 	main()
