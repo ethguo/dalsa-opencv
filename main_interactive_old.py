@@ -3,11 +3,12 @@ import numpy as np
 from matplotlib.figure import Figure
 from time import sleep, time
 
-from cvutils import loadImage, adaptiveThreshold, axShowImage, axPaint
+from cvutils import adaptiveThreshold
 from detector import CalibrationDetector, SensorDetector
 from transform import getPerspectiveTransform
 from tray import getTrayDef
 from ui import TkUI
+from utils import loadImage, axShowImage, axPaint
 
 PATH_IMAGE = "img/calibration/img1.png"
 PATH_CALIBRATION_PATTERN = "img/calibration/calibration_320.png"
