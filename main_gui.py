@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import logging
 from matplotlib.figure import Figure
 from time import sleep, time

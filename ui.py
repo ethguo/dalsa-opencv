@@ -136,11 +136,8 @@ class TkSliderManager:
 				tk_variable = tk.DoubleVar()
 			else:
 				raise ValueError("var_type " + str(var_type) + " not supported.")
-		else: # If var_type not specified, if any of the numerical parameters were floats, then use a DoubleVar.
-			if type(initial_value) is float \
-					or type(from_) is float \
-					or type(to) is float \
-					or type(resolution) is float:
+		else: # If var_type not specified, if any of the numerical parameters are floats, then use a DoubleVar.
+			if float in (type(initial_value), type(from_), type(to), type(resolution)):
 				tk_variable = tk.DoubleVar()
 			else: # Otherwise, use an IntVar.
 				tk_variable = tk.IntVar()

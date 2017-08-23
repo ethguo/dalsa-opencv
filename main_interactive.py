@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Please note that this file is 'deprecated', in that it still works, but the code isn't up to par with main.py and main_gui.py."""
 import cv2
 import numpy as np

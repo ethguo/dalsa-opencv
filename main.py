@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import logging
 
 from yaml_config import loadYAML
@@ -15,6 +16,7 @@ def main():
 	results = detectSensors(img, params, tray)
 
 	print(results)
+
 
 if __name__ == "__main__":
 	main()
