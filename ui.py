@@ -127,9 +127,6 @@ class TkSliderManager:
 		    callback (callable, optional): A function to be called every time the value changes.
 		    var_type (type or str, optional): If `int` or `"int"`, use a `tkinter.IntVar`. If `float` or `"float"`, use a `tkinter.DoubleVar`. If not specified, determines the type based on the types of the numerical arguments provided.
 		    **kwargs: Passed on to the `tkinter.Scale` constructor.
-		
-		Raises:
-		    ValueError: Description
 		"""
 		# Determine the correct type of tkinter Variable to use.
 		if var_type:
