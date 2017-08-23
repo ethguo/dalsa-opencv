@@ -47,11 +47,11 @@ def main():
 
 	while True:
 
-		calibration_detector.match_threshold, changed1 = ui.getSlider("calib_match_threshold")
-		calibration_detector.clustering_bandwidth, changed2 = ui.getSlider("clustering_bandwidth")
-		block_radius, changed3 = ui.getSlider("block_radius")
-		c, changed4 = ui.getSlider("c")
-		sensor_detector.match_threshold, changed5 = ui.getSlider("sensor_match_threshold")
+		calibration_detector.match_threshold, changed1 = ui.getSliderChanged("calib_match_threshold")
+		calibration_detector.clustering_bandwidth, changed2 = ui.getSliderChanged("clustering_bandwidth")
+		block_radius, changed3 = ui.getSliderChanged("block_radius")
+		c, changed4 = ui.getSliderChanged("c")
+		sensor_detector.match_threshold, changed5 = ui.getSliderChanged("sensor_match_threshold")
 
 		if any((changed1, changed2, changed3, changed4, changed5)):
 			img_proc = adaptiveThreshold(img, block_radius, c)
