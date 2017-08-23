@@ -39,6 +39,9 @@ class CalibrationDetectorResult (DetectorResult):
 	Attributes:
 	    centers (numpy.ndarray): Center point of each matched object.
 	    scores (numpy.ndarray): The quality of match ([0..1]).
+
+	Args:
+	    Passed from CalibrationDetector.
 	"""
 	def __init__(self, matches, match_map, pattern):
 		self._positions = np.flip(matches, axis=1)
@@ -51,7 +54,7 @@ class CalibrationDetectorResult (DetectorResult):
 		self.centers = np.flip(centers, axis=1)
 
 	def axPaint(self, ax):
-		"""Adds matplotlib patches to the given `ax` to indicate the match locations.
+		"""Display the matches' locations on the given `ax` using matplotlib patches.
 		
 		Args:
 		    ax (matplotlib.axes.Axes): The `Axes` to paint onto.
@@ -78,6 +81,9 @@ class SensorDetectorResult (DetectorResult):
 	    centers (numpy.ndarray): Center point of each matched object.
 	    matches (numpy.ndarray): Whether or not each cell is a valid match.
 	    scores (numpy.ndarray): The quality of match ([0..1]).
+
+	Args:
+	    Passed from SensorDetector.
 	"""
 	def __init__(self, offsets, scores, pattern, tray):
 		self._offsets = np.flip(offsets, axis=2)
@@ -92,7 +98,7 @@ class SensorDetectorResult (DetectorResult):
 		self.centers = np.flip(centers, axis=2)
 
 	def axPaint(self, ax):
-		"""Adds matplotlib patches to the given `ax` to indicate the match locations.
+		"""Display the matches' locations on the given `ax` using matplotlib patches.
 		
 		Args:
 		    ax (matplotlib.axes.Axes): The `Axes` to paint onto.
