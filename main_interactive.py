@@ -11,9 +11,9 @@ from tray import getTrayDef
 from ui import TkUI, axShowImage, axPaint
 from utils import loadImage
 
-PATH_IMAGE = "img/calibration/img1.png"
-PATH_CALIBRATION_PATTERN = "img/calibration/calibration_320.png"
-PATH_SENSOR_PATTERN = "img/calibration/pattern2.png"
+PATH_IMAGE = "img/img1.png"
+PATH_CALIBRATION_PATTERN = "img/calibration_320.png"
+PATH_SENSOR_PATTERN = "img/pattern2.png"
 SCALE_IMAGE = 1/4
 SCALE_CALIBRATION_PATTERN = 1/4
 SCALE_SENSOR_PATTERN = 1/4
