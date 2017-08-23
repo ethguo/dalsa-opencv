@@ -4,7 +4,7 @@ image:
 
 tray:
   name: qvga_7x7
-  scale: 2
+  scale: 8
 
 calibration_detector:
   preprocessing:
@@ -21,13 +21,13 @@ sensor_detectors:
 - name: sensor_without_lid
   pattern:
     path: img/pattern1.png
-    scale: 0.25
+    scale: 1
   detector:
-    match_threshold: 0.4
+    match_threshold: 0.3
 - name: sensor_with_lid
   pattern:
     path: img/pattern2.png
-    scale: 0.25
+    scale: 1
   detector:
     match_threshold: 0.5
 
