@@ -4,5 +4,4 @@ __pycache__/
 *.py[cdo]
 *$py.class
 
-img/
-temp.py
+data/
