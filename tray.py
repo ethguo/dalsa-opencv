@@ -2,7 +2,7 @@ import numpy as np
 
 from matplotlib.patches import Circle, Rectangle
 from detector import CalibrationDetector
-from config import loadYAML
+from yaml_config import loadYAML
 
 class TrayDefinition:
 	def __init__(self, data, scale=1):

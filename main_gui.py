@@ -2,7 +2,7 @@ import logging
 from matplotlib.figure import Figure
 from time import sleep, time
 
-from config import loadYAML
+from yaml_config import loadYAML
 from tray import getTrayDef
 from ui import TkUI, axShowImage, axPaint
 from utils import loadImage, calibrate, detectSensors

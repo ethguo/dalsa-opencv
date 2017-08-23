@@ -1,6 +1,6 @@
 import logging
 
-from config import loadYAML
+from yaml_config import loadYAML
 from tray import getTrayDef
 from utils import loadImage, calibrate, detectSensors
 
