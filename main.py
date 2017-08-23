@@ -2,7 +2,7 @@ import logging
 
 from config import loadYAML
 from tray import getTrayDef
-from utils import loadImage, calibrate, detectSensors
+from find_sensors import loadImage, calibrate, detectSensors
 
 def main():
 	logging.basicConfig(level=logging.INFO)

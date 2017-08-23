@@ -5,7 +5,7 @@ from time import sleep, time
 from config import loadYAML
 from tray import getTrayDef
 from ui import TkUI, axShowImage, axPaint
-from utils import loadImage, calibrate, detectSensors
+from find_sensors import loadImage, calibrate, detectSensors
 
 def draw(img, results, tray):
 	f = Figure()

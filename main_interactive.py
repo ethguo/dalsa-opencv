@@ -9,7 +9,7 @@ from detector import CalibrationDetector, SensorDetector
 from transform import getPerspectiveTransform
 from tray import getTrayDef
 from ui import TkUI, axShowImage, axPaint
-from utils import loadImage
+from find_sensors import loadImage
 
 PATH_IMAGE = "img/img1.png"
 PATH_CALIBRATION_PATTERN = "img/calibration_320.png"
