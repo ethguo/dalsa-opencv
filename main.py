@@ -5,7 +5,7 @@ from tray import getTrayDef
 from utils import loadImage, calibrate, detectSensors
 
 def main():
-	logging.basicConfig(level=logging.INFO)
+	logging.basicConfig(level=logging.DEBUG)
 
 	params = loadYAML("parameters.yml")
 	tray = getTrayDef(**params.tray)
