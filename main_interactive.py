@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Please note that this file is 'deprecated', as in it still works, but the code isn't up to par with main.py and main_gui.py."""
+"""Please note that this file is 'deprecated', as in it still works, but the code isn't up to par with main.py and main_gui.py. Use one of those as your starting point for further development."""
 from time import sleep, time
 
 import cv2
