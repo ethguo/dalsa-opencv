@@ -86,4 +86,4 @@ def detectSensors(img, params, tray):
 	# But if none of them matched (i.e. if none of the scores were > 0), put in -1.
 	best_matches = np.where(best_scores > 0, best_sensor_type, -1)
 
-	return best_matches
+	return best_matches, results

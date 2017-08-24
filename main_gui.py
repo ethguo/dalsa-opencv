@@ -45,14 +45,16 @@ class Main:
 		# Do all the important stuff.
 		img = loadImage(**self.params.image)
 		self.img = calibrate(img, self.params, self.tray)
-		self.results = detectSensors(self.img, self.params, self.tray)
+		self.matches, self.results = detectSensors(self.img, self.params, self.tray)
 
 		self.draw() # Redraw the matplotlib display, because (in theory) the results may have changed.
 
 	def draw(self):
 		# Redraw the image and results on the matplotlib Axes.
 		axShowImage(self.ax, self.img)
-		self.tray.drawGrid(self.ax, self.results)
+		self.tray.drawGrid(self.ax, self.matches)
+		for result in self.results:
+			axPaint(self.ax, result)
 
 
 if __name__ == "__main__":

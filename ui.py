@@ -38,10 +38,10 @@ def axPaint(ax, matches):
 	    ax (matplotlib.axes.Axes): `Axes` passed to `matches.axPaint`
 	    matches (detector_result.DetectorResult): `DetectorResult` object to paint. Will warn if None.
 	"""
-	if matches:
-		matches.axPaint(ax)
-	else:
+	if matches is None:
 		logging.warning("Cannot axPaint: No matches")
+	else:
+		matches.axPaint(ax)
 
 
 class TkUI:	

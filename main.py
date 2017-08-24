@@ -20,9 +20,9 @@ def main():
 
 	# Calibrate image and detect sensors.
 	img = calibrate(img, params, tray)
-	results = detectSensors(img, params, tray)
+	matches, _ = detectSensors(img, params, tray)
 
-	print(results)
+	print(matches)
 
 
 if __name__ == "__main__":

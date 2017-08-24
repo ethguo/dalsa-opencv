@@ -79,7 +79,7 @@ class SensorDetectorResult (DetectorResult):
 	`matches` and `scores` are 2D arrays which correspond with the rows and cols of the tray.
 	
 	Attributes:
-	    centers (numpy.ndarray): Center point of each matched object.
+	    centers (numpy.ndarray): Center point of each matched object. This isn't necessarily in the center of the cell.
 	    matches (numpy.ndarray): Whether or not each cell is a valid match.
 	    scores (numpy.ndarray): The quality of match ([0..1]).
 
