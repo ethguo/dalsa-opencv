@@ -3,7 +3,7 @@ from yaml import safe_load
 
 
 class YAMLDict (dict):
-	"""A subclass of dict whose values can also be accessed as attributes. That is, `a["b"]["c"]` can be instead written as `a.b.c`."""
+	"""A subclass of dict whose values can also be accessed as attributes. That is, `a["b"]["c"]` can instead be written as `a.b.c`."""
 	def __init__(self, obj):
 		obj = {key: YAMLObject(value) for key, value in obj.items()}
 		dict.__init__(self, obj)
