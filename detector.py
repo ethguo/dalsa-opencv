@@ -1,6 +1,9 @@
-"""Note about indices and index arrays (sparse arrays):
+"""Classes that do two different use cases of template matching.
+
+Note about indices and index arrays (sparse arrays):
 In detector.py, indices are (y, x). This is for ease of processing.
 In detector_result.py, indices are (x, y). This is to follow numpy convention.
+The conversion happens in `CalibrationDetectorResult.__init__` and `SensorDetectorResult.__init__`.
 """
 
 import cv2
@@ -10,6 +13,7 @@ from sklearn.cluster import MeanShift, estimate_bandwidth
 
 from detector_result import CalibrationDetectorResult, SensorDetectorResult
 
+#TODO: Honestly, these two classes don't need to be classes, they should just be functions.
 class CalibrationDetector:
 	def __init__(self, params={}, **kwargs):
 		# Available parameters:
@@ -20,11 +24,11 @@ class CalibrationDetector:
 		# Combine params and kwargs -- Use params dict and/or kwargs to seed parameters
 		params.update(kwargs)
 
-		for k,v in params.items():
-			if k in self.__dict__:
-				self.__dict__[k] = v
+		for name, value in params.items():
+			if name in self.__dict__:
+				self.__dict__[name] = value # Set self.name to value
 			else:
-				raise AttributeError("Unknown parameter: " + k)
+				raise AttributeError("Unknown parameter: " + name)
 
 		self.clusterer = MeanShift(self.clustering_bandwidth)
 
@@ -67,11 +71,11 @@ class SensorDetector:
 		# Combine params and kwargs -- Use params dict and/or kwargs to seed parameters
 		params.update(kwargs)
 
-		for k,v in params.items():
-			if k in self.__dict__:
-				self.__dict__[k] = v
+		for name, value in params.items():
+			if name in self.__dict__:
+				self.__dict__[name] = value # Set self.name to value
 			else:
-				raise AttributeError("Unknown parameter: " + k)
+				raise AttributeError("Unknown parameter: " + name)
 
 	def detect(self, img, pattern, tray):
 		offsets = np.full((tray.rows, tray.cols, 2), -1, dtype=np.int_)

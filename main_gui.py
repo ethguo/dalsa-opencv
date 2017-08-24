@@ -1,33 +1,46 @@
+#!/usr/bin/env python3
 import logging
 from matplotlib.figure import Figure
 from time import sleep, time
 
-from config import loadYAML
+from yaml_config import loadYAML
 from tray import getTrayDef
 from ui import TkUI, axShowImage, axPaint
 from find_sensors import loadImage, calibrate, detectSensors
 
-def draw(img, results, tray):
-	f = Figure()
-	ui = TkUI(f, "main")
-	ax = f.add_subplot(111)
-	axShowImage(ax, img)
-	tray.drawGrid(ax, results)
-	ui.mainloop()
+class Main:
+	def __init__(self):
+		logging.basicConfig(level=logging.DEBUG)
 
-def main():
-	logging.basicConfig(level=logging.DEBUG)
+		self.params = loadYAML("parameters.yml")
+		self.tray = getTrayDef(**self.params.tray)
 
-	params = loadYAML("parameters.yml")
-	tray = getTrayDef(**params.tray)
+		self.f = Figure()
+		self.ui = TkUI(self.f, "main")
+		self.ax = self.f.add_subplot(111)
 
-	img = loadImage(**params.image)
-	img = calibrate(img, params, tray)
-	results = detectSensors(img, params, tray)
+		self.ui.addSlider("test", callback=self.onChange)
 
-	draw(img, results, tray)
+		self.update()
+		self.ui.mainloop()
 
-	print(results)
+	def onChange(self, *args):
+		value = self.ui.getSlider("test")
+		self.ui.setTableRow("test", value)
+
+		self.update()
+
+	def update(self):
+		img = loadImage(**self.params.image)
+		self.img = calibrate(img, self.params, self.tray)
+		self.results = detectSensors(self.img, self.params, self.tray)
+
+		self.draw()
+
+	def draw(self):
+		axShowImage(self.ax, self.img)
+		self.tray.drawGrid(self.ax, self.results)
+
 
 if __name__ == "__main__":
-	main()
+	Main()

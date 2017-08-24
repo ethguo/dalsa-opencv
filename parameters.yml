@@ -30,4 +30,3 @@ sensor_detectors:
     scale: 1
   detector:
     match_threshold: 0.5
-

@@ -1,11 +1,12 @@
+#!/usr/bin/env python3
 import logging
 
-from config import loadYAML
+from yaml_config import loadYAML
 from tray import getTrayDef
 from find_sensors import loadImage, calibrate, detectSensors
 
 def main():
-	logging.basicConfig(level=logging.INFO)
+	logging.basicConfig(level=logging.DEBUG)
 
 	params = loadYAML("parameters.yml")
 	tray = getTrayDef(**params.tray)
@@ -15,6 +16,7 @@ def main():
 	results = detectSensors(img, params, tray)
 
 	print(results)
+
 
 if __name__ == "__main__":
 	main()
