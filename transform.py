@@ -1,15 +1,19 @@
+"""This module includes a function and the class which it returns, which wrap opencv's perspective (non-affine) transformation modules."""
 import cv2
 import numpy as np
 
 class PerspectiveTransform:
+	"""Encapsulates a 3x3 transform matrix calculated by `cv2.getPerspectiveTransform`, and provides convenience methods that wrap `cv2.warpPerspective` and `cv2.perspectiveTransform`."""
 	def __init__(self, matrix, image_shape):
 		self.matrix = matrix
 		self.image_shape = image_shape
 
 	def transformImage(self, img):
+		"""Wrapper around `cv2.warpPerspective`, which takes an image and outputs a transformed image."""
 		return cv2.warpPerspective(img, self.matrix, self.image_shape)
 
 	def transformPoints(self, points):
+		"""Wrapper around `cv2.perspectiveTransform`, which takes an array of points (sparse array) and transforms each point."""
 		return cv2.perspectiveTransform(points, self.matrix)
 
 	def __call__(self, array):
