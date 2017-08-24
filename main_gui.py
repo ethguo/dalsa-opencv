@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 import logging
-from matplotlib.figure import Figure
-from time import sleep, time
 
-from yaml_config import loadYAML
+from matplotlib.figure import Figure
+
+from find_sensors import calibrate
+from find_sensors import detectSensors
+from find_sensors import loadImage
 from tray import getTrayDef
-from ui import TkUI, axShowImage, axPaint
-from find_sensors import loadImage, calibrate, detectSensors
+from ui import axPaint
+from ui import axShowImage
+from ui import TkUI
+from yaml_config import loadYAML
+
 
 class Main:
 	def __init__(self):

@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
-"""Please note that this file is 'deprecated', in that it still works, but the code isn't up to par with main.py and main_gui.py."""
+"""Please note that this file is 'deprecated', as in it still works, but the code isn't up to par with main.py and main_gui.py."""
+from time import sleep, time
+
 import cv2
 import numpy as np
 from matplotlib.figure import Figure
-from time import sleep, time
 
 from cvutils import adaptiveThreshold
-from detector import CalibrationDetector, SensorDetector
+from detector import CalibrationDetector
+from detector import SensorDetector
 from transform import getPerspectiveTransform
 from tray import getTrayDef
-from ui import TkUI, axShowImage, axPaint
+from ui import axPaint
+from ui import axShowImage
+from ui import TkUI
 from find_sensors import loadImage
+
 
 PATH_IMAGE = "img/img1.png"
 PATH_CALIBRATION_PATTERN = "img/calibration_320.png"

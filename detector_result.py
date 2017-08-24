@@ -5,13 +5,14 @@ In detector.py, indices are (y, x). This is for ease of processing.
 In detector_result.py, indices are (x, y). This is to follow numpy convention.
 The conversion happens in `CalibrationDetectorResult.__init__` and `SensorDetectorResult.__init__`.
 """
-
 import numpy as np
 from matplotlib.patches import Circle, Rectangle
+
 
 """Given a float value in [0..1], returns a RGB or BGR 3-tuple mapping the input to a color between 0=red and 1=green"""
 _color_gradient_bgr = lambda val: (0, val*2*255, 255) if val < 0.5 else (0, 255, (1-val)*2*255) # Currently unused; useful for working with cv2 draw functions
 _color_gradient_rgb = lambda val: (1, val*2, 0) if val < 0.5 else ((1-val)*2, 1, 0)
+
 
 class DetectorResult:
 	"""Base class for CalibrationDetectorResult and SensorDetectorResult."""

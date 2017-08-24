@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 import logging
 
-from yaml_config import loadYAML
+from find_sensors import calibrate
+from find_sensors import detectSensors
+from find_sensors import loadImage
 from tray import getTrayDef
-from find_sensors import loadImage, calibrate, detectSensors
+from yaml_config import loadYAML
+
 
 def main():
 	logging.basicConfig(level=logging.DEBUG)

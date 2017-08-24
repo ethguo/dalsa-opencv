@@ -1,15 +1,17 @@
 """This module includes classes which construct and manage UIs, as well as convenience functions for drawing on matplotlib `Axes`."""
-import cv2
 import logging
-import numpy as np
 import tkinter as tk
 import tkinter.ttk as ttk
+
+import cv2
+import numpy as np
 
 # These lines are required, in this order, to make matplolib not complain. Don't try moving them around.
 import matplotlib
 matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # Any additional imports from matplotlib should go here.
+
 
 def axShowImage(ax, img, cmap="gray"):
 	"""Wrapper around matplotlib's `ax.imshow`, automatically detects whether the image is color or grayscale and behaves accordingly.
@@ -27,6 +29,7 @@ def axShowImage(ax, img, cmap="gray"):
 	else:
 		ax.imshow(img, cmap=cmap)
 
+
 def axPaint(ax, matches):
 	"""Calls `matches.axPaint` or gracefully handles Nones.
 	
@@ -38,6 +41,7 @@ def axPaint(ax, matches):
 		matches.axPaint(ax)
 	else:
 		logging.warning("Cannot axPaint: No matches")
+
 
 class TkUI:	
 	"""Manages Tk root object, FigureCanvasTkAgg object, TkSliderManager and TkTable objects.
@@ -236,7 +240,6 @@ class TkTable:
 
 		# Set a format tag for displaying ndarrays in a fixed-width font.
 		self.tree.tag_configure("ndarray_line", font="Courier 9 bold")
-
 
 	def set(self, name, value):
 		"""Sets the value of an entry, creating it if it doesn't exist.

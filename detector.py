@@ -5,13 +5,15 @@ In detector.py, indices are (y, x). This is for ease of processing.
 In detector_result.py, indices are (x, y). This is to follow numpy convention.
 The conversion happens in `CalibrationDetectorResult.__init__` and `SensorDetectorResult.__init__`.
 """
+import logging
 
 import cv2
 import numpy as np
-import logging
-from sklearn.cluster import MeanShift, estimate_bandwidth
+from sklearn.cluster import MeanShift
 
-from detector_result import CalibrationDetectorResult, SensorDetectorResult
+from detector_result import CalibrationDetectorResult
+from detector_result import SensorDetectorResult
+
 
 #TODO: Honestly, these two classes don't need to be classes, they should just be functions.
 class CalibrationDetector:

@@ -5,7 +5,9 @@ from matplotlib.patches import Circle, Rectangle
 from detector import CalibrationDetector
 from yaml_config import loadYAML
 
+
 _trays_data = None
+
 
 class TrayDefinition:
 	"""Represents a tray spec loaded from a YAML config file. Provides convenience methods for working with the tray's rows/cols and x/y positions.

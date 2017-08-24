@@ -1,6 +1,7 @@
 """A collection of convenience wrappers around useful cv2 functions"""
 import cv2
 
+
 def scaleImage(img, scale):
 	if scale < 1: # Pick the right interpolation method for scaling up or down
 		interpolation = cv2.INTER_AREA

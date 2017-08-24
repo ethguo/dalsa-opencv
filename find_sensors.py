@@ -1,10 +1,14 @@
-import cv2
-import numpy as np
 import logging
 
-from cvutils import scaleImage, adaptiveThreshold
-from detector import CalibrationDetector, SensorDetector
+import cv2
+import numpy as np
+
+from cvutils import adaptiveThreshold
+from cvutils import scaleImage
+from detector import CalibrationDetector
+from detector import SensorDetector
 from transform import getPerspectiveTransform
+
 
 def loadImage(path, scale=1):
 	img = cv2.imread(path, cv2.IMREAD_COLOR)
@@ -12,6 +16,7 @@ def loadImage(path, scale=1):
 		raise FileNotFoundError("No such file: " + path)
 	img = scaleImage(img, scale)
 	return img
+
 
 def calibrate(img, params, tray):
 	pattern = loadImage(**params.calibration_detector.pattern)
@@ -31,6 +36,7 @@ def calibrate(img, params, tray):
 	img_transformed = transform(img)
 	return img_transformed
 
+
 def detectSensors(img, params, tray):
 	results = []
 	for detector_params in params.sensor_detectors:
@@ -43,6 +49,7 @@ def detectSensors(img, params, tray):
 	best_matches = findBestMatches(results)
 
 	return best_matches
+
 
 def findBestMatches(results):
 	all_scores = np.stack([result.scores for result in results])
