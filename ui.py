@@ -12,6 +12,7 @@ matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # Any additional imports from matplotlib should go here.
 
+from cvutils import isColorImage
 
 def axShowImage(ax, img, cmap="gray"):
 	"""Wrapper around matplotlib's `ax.imshow`, automatically detects whether the image is color or grayscale and behaves accordingly.
@@ -22,7 +23,7 @@ def axShowImage(ax, img, cmap="gray"):
 	    cmap (str, optional): If image is grayscale, the matplotlib colormap to use.
 	"""
 	ax.clear()
-	if img.ndim == 3 and img.shape[2] == 3:
+	if isColorImage(img):
 		# If it's a color image, convert it from BGR (cv2) to RGB (matplotlib).
 		img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 		ax.imshow(img)
