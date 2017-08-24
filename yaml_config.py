@@ -35,7 +35,7 @@ def loadYAML(path):
 	    path (str): Path to the YAML file.
 	
 	Returns:
-	    YAMLDict or YAMLList: The root item in the given file, as a YAMLObject.
+	    YAMLDict or YAMLList: The root item in the specified file, as a YAMLObject.
 	"""
 	with open(path) as file:
 		obj = safe_load(file)
