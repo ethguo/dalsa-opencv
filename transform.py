@@ -1,23 +1,30 @@
 import cv2
 import numpy as np
 
-
 class PerspectiveTransform:
-	def __init__(self, matrix, shape):
+	def __init__(self, matrix, image_shape):
 		self.matrix = matrix
-		self.shape = shape
+		self.image_shape = image_shape
 
 	def transformImage(self, img):
-		return cv2.warpPerspective(img, self.matrix, self.shape)
+		return cv2.warpPerspective(img, self.matrix, self.image_shape)
 
 	def transformPoints(self, points):
 		return cv2.perspectiveTransform(points, self.matrix)
 
-	def __call__(self, arg):
-		if arg.shape[1] == 2 and arg.ndim == 2:
-			return self.transformPoints(arg)
-		elif arg.ndim == 2 or arg.ndim == 3:
-			return self.transformImage(arg)
+	def __call__(self, array):
+		"""Convenience method. Automatically determines whether it's called on a points (sparse) array or an array representing an image, and transforms it accordingly.
+		
+		Args:
+		    array (numpy.ndarray): If it's a points (sparse) array, uses `cv2.perspectiveTransform`. If it's an image array, uses `cv2.warpPerspective`.
+		
+		Returns:
+		    numpy.ndarray: The points array or image array, transformed.
+		"""
+		if array.shape[1] == 2 and array.ndim == 2:
+			return self.transformPoints(array)
+		elif array.ndim == 2 or array.ndim == 3:
+			return self.transformImage(array)
 		else:
 			raise TypeError("Argument not recognized as an image array or points (sparse) array.")
 

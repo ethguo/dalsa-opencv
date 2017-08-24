@@ -13,7 +13,8 @@ class TrayDefinition:
 	"""Represents a tray spec loaded from a YAML config file. Provides convenience methods for working with the tray's rows/cols and x/y positions.
 	
 	Note:
-	    `height` doesn't have to equal `cell_height * rows`, if `height` > `cell_height * rows`, the cells will be centered within the larger plane. Likewise for `width` and `cell_width * cols`.
+	    `height` doesn't have to equal `cell_height * rows`, if `height` > `cell_height * rows`, the cells will be centered within the larger plane.
+	    Likewise for `width` and `cell_width * cols`.
 	
 	Attributes:
 	    cell_height (float): The height of each cell in the tray, i.e. the vertical distance from the center of one cell to the next.
