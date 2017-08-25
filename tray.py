@@ -88,12 +88,13 @@ class TrayDefinition:
 		cell = img[y1:y2, x1:x2, :]
 		return cell
 
-	def drawGrid(self, ax, labels=None):
+	def drawGrid(self, ax, labels=None, thickness=2):
 		"""Display each cell's location on the given `ax` using matplotlib patches.
 		
 		Args:
 		    ax (matplotlib.axes.Axes): `Axes` to paint onto.
 		    labels (numpy.ndarray, optional): If provided, use a different color for each distinct value. Must match the shape (tray.row, tray.col). 
+		    thickness (int, optional): Line thickness.
 		"""
 		x0 = (self.width - self.cell_width * self.cols) / 2
 		y0 = (self.height - self.cell_height * self.rows) / 2
@@ -105,11 +106,17 @@ class TrayDefinition:
 
 		color = "b"
 		for row, col in self:
-			x1, y1 = self.getPos(row, col)
 			if labels is not None:
 				label = labels[row, col]
 				color = colors[label]
-			rect = Rectangle((x1+1, y1+1), self.cell_width-2, self.cell_height-2, alpha=1, fill=False, color=color)
+			
+			x1, y1 = self.getPos(row, col)
+			x, y = x1 + thickness, y1 + thickness
+			width, height = self.cell_width - 2*thickness, self.cell_height - 2*thickness
+
+			rect = Rectangle(
+				(x, y), width, height, 
+				linewidth=thickness, alpha=1, fill=False, color=color)
 			ax.add_patch(rect)
 
 	def __iter__(self):
