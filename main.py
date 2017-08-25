@@ -20,9 +20,14 @@ def main():
 
 	# Calibrate image and detect sensors.
 	img = calibrate(img, params, tray)
-	matches, _ = detectSensors(img, params, tray)
+	matches, results = detectSensors(img, params, tray)
 
 	print(matches)
+
+	# Sample of how things are structured:
+	sensor_type = matches[0, 0]
+	center = results[sensor_type].centers[0, 0]
+	print(center)
 
 
 if __name__ == "__main__":
