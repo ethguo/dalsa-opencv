@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Please note that this file is 'deprecated', as in it still works, but the code isn't up to par with main.py and main_gui.py. Use one of those as your starting point for further development."""
+"""Please note that this file is 'deprecated', as in it still works, but the code isn't up to par with main.py and main_gui.py.
+I suggest using one of the other files as your starting point for further development. However, run this file to get a feel for how the detectors work and what the different parameters look like."""
 from time import sleep, time
 
 import cv2
@@ -84,7 +85,6 @@ def main():
 
 				t2 = time()
 
-				# for cell, row, col, x1, y1, x2, y2 in getCells(img_transformed, tray):
 				sensor_matches = sensor_detector.detect(img_transformed, sensor_pattern, tray)
 
 				ui.setTableRow("SensorDetector time", time() - t2)

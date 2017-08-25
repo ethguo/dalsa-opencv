@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""This file performs all the `find_sensors` operations and also includes an example of how to integrate UI elements (sliders and table entries)."""
+"""This file performs all the `find_sensors` operations and also includes an example of how to integrate UI elements (sliders and table entries).
+Use this file as a starting point for testing and developing any new features."""
 import logging
 
 from matplotlib.figure import Figure
@@ -31,7 +32,6 @@ class Main:
 		self.ui.addSlider("test", callback=self.onChange) # Add an example slider.
 
 		self.update() # Run all the important stuff.
-
 		self.ui.mainloop() # Allow the UI to do it's thing and listen for events (like the slider's onChange).
 
 	def onChange(self, *args):
@@ -42,7 +42,7 @@ class Main:
 		self.update() # In theory, updating the slider would update parameters which would require re-running calibrate and/or detectSensors.
 
 	def update(self):
-		# Do all the important stuff.
+		# Do all the important stuff:
 		img = loadImage(**self.params.image)
 		self.img = calibrate(img, self.params, self.tray)
 		self.matches, self.results = detectSensors(self.img, self.params, self.tray)

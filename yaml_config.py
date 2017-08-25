@@ -1,5 +1,5 @@
 """This module deals with loading and using YAML configuration files."""
-from yaml import safe_load
+from yaml import safe_load # See http://pyyaml.org/wiki/PyYAMLDocumentation
 
 
 class YAMLDict (dict):

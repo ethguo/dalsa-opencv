@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Minimum code for full functionality (no GUI). Probably use this file as a starting point for integrating with ROS."""
+"""Minimum code for full functionality (no GUI). Use this file as a starting point for integrating with ROS."""
 import logging
 
 from find_sensors import calibrate
