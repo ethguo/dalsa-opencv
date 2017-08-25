@@ -1,6 +1,7 @@
 image:
   path: img/img1.png
   scale: 0.25
+  color: False
 
 tray:
   name: qvga_7x7
@@ -13,6 +14,7 @@ calibration_detector:
   pattern:
     path: img/calibration_320.png
     scale: 0.25
+    color: False
   detector:
     match_threshold: 0.5
     clustering_bandwidth: 40
@@ -22,11 +24,13 @@ sensor_detectors:
   pattern:
     path: img/pattern1.png
     scale: 1
+    color: False
   detector:
     match_threshold: 0.3
 - name: sensor_with_lid
   pattern:
     path: img/pattern2.png
     scale: 1
+    color: False
   detector:
     match_threshold: 0.5

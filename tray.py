@@ -85,7 +85,7 @@ class TrayDefinition:
 		    numpy.ndarray: The image of the specified cell.
 		"""
 		x1, y1, x2, y2 = self.getBounds(row, col)
-		cell = img[y1:y2, x1:x2, :]
+		cell = img[y1:y2, x1:x2]
 		return cell
 
 	def drawGrid(self, ax, labels=None, thickness=2):

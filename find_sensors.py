@@ -12,9 +12,10 @@ from detector import SensorDetector
 from transform import getPerspectiveTransform
 
 
-def loadImage(path, scale=1):
+def loadImage(path, scale=1, color=True):
 	"""Loads an image by path at a specified scale."""
-	img = cv2.imread(path, cv2.IMREAD_COLOR)
+	mode = cv2.IMREAD_COLOR if color else cv2.IMREAD_GRAYSCALE
+	img = cv2.imread(path, mode)
 	if img is None:
 		raise FileNotFoundError("No such file: " + path)
 	img = scaleImage(img, scale)
